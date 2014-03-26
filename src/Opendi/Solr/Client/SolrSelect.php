@@ -1,0 +1,180 @@
+<?php
+namespace Opendi\Solr\Client;
+
+/**
+ * http://stackoverflow.com/questions/8089947/solr-and-query-over-multiple-fields
+ * https://wiki.apache.org/solr/MoreLikeThis
+ * Facets
+ *
+ * TODO http://localhost:8983/solr/entries/select?q=categories%3AFriseur*&wt=json&indent=true&fq={!geofilt%20pt=48.166535,11.5178152%20sfield=location%20d=5}&sfield=location&pt=48.166535,11.5178152&sort=geodist()%20asc
+ *
+ * Class SolrSelect
+ * @package opendi\solrclient
+ */
+class SolrSelect extends SolrExpression {
+
+    const FORMAT_JSON = 'json';
+    const FORMAT_XML = 'xml';
+    const FORMAT_RUBY = 'ruby';
+    const FORMAT_PHP = 'php';
+    const FORMAT_CSV = 'csv';
+
+    private $filters = [];
+    private $components = [];
+
+    private $andExpressions = [];
+    private $orExpressions = [];
+
+    private $queryFields = [];
+
+    /** @var SolrFacet */
+    private $facet = null;
+
+    private $indent = false;
+    private $format = null;
+    private $rows = null;
+    private $debug = false;
+
+    private $raw = null;
+
+    /** @var SolrParser */
+    private $parser = null;
+
+    public function andExpression(SolrExpression $expression) {
+        $this->andExpressions[] = $expression;
+        return $this;
+    }
+
+    public function orExpression(SolrExpression $expression) {
+        $this->orExpressions[] = $expression;
+        return $this;
+    }
+
+    public function queryField($fieldName) {
+        $this->queryFields[] = $fieldName;
+        return $this;
+    }
+
+    public function indent() {
+        $this->indent = true;
+        return $this;
+    }
+
+    public function debug() {
+        $this->debug = true;
+        return $this;
+    }
+
+    public function rows($max) {
+        $this->rows = $max;
+        return $this;
+    }
+
+    public function format($format) {
+        $this->format = $format;
+        return $this;
+    }
+
+    public function filter(SolrFilter $filter) {
+        $this->filters[] = $filter;
+        return $this;
+    }
+
+    public function facet(SolrFacet $facet) {
+        $this->facet = $facet;
+        return $this;
+    }
+
+    public function addComponents($component) {
+        $this->components[] = $component;
+        return $this;
+    }
+
+    public function raw($raw) {
+        $this->raw = $raw;
+        return $this;
+    }
+
+    /**
+     * Use an alternate parser to the lucene one, like dismax
+     *
+     * @param SolrParser $parser
+     * @return $this
+     */
+    public function parser(SolrParser $parser) {
+        $this->parser = $parser;
+        return $this;
+    }
+
+    public function get() {
+        if (sizeOf($this->queryAnd) == 0 && sizeOf($this->andExpressions) == 0) {
+            throw new SolrException('At least one search query must be given. If you want to select all, try *');
+        }
+        return (string)$this->render();
+    }
+
+    private function render() {
+        $query = 'q=';
+
+        $query .= parent::get();
+
+        if (sizeOf($this->andExpressions)) {
+            /** @var SolrExpression $expression */
+            foreach ($this->andExpressions as $expression) {
+                if ($query != 'q=') {
+                    $query .= '%20AND%20';
+                }
+                $query .= '(' . $expression->get() . ')';
+            }
+        }
+
+        if (sizeOf($this->orExpressions)) {
+            /** @var SolrExpression $expression */
+            foreach ($this->orExpressions as $expression) {
+                if ($query != 'q=') {
+                    $query .= '%20OR%20';
+                }
+                $query .= '(' . $expression->get() . ')';
+            }
+        }
+
+        if (sizeOf($this->queryFields) > 0) {
+            $query .= '&qf=' . implode('%20', $this->queryFields);
+        }
+
+        if ($this->parser != null) {
+            $query .= '&' . $this->parser->get();
+        }
+
+        if ($this->format != null) {
+            $query .= '&wt=' . $this->format;
+        }
+
+        if ($this->indent) {
+            $query .= '&indent=true';
+        }
+
+        if ($this->debug) {
+            $query .= '&debug=true';
+        }
+
+        if (is_numeric($this->rows)) {
+            $query .= '&rows='.$this->rows;
+        }
+
+        $filters = implode('&', $this->filters);
+        if ($filters != '') {
+            $query .= '&'.$filters;
+        }
+
+        if ($this->facet != null) {
+            $query .= '&'. $this->facet->get();
+        }
+
+        if ($this->raw != null) {
+            $query .= $this->raw;
+        }
+
+        return $query;
+    }
+} 
