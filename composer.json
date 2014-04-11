@@ -1,5 +1,26 @@
 {
+    "name": "opendi/solrclient",
+     "type": "library",
+     "description": "Client for Apache Solr",
+     "keywords": ["solr"],
+     "homepage": "https://github.com/opendi/solrclient",
+     "authors": [
+         {
+             "name": "Opendi AG",
+             "email": "info@opendi.com",
+             "homepage": "http://www.opendi.com/",
+             "role": "Developer"
+         }
+     ],
+     "require": {
+         "php": ">=5.4.0"
+     },
     "require-dev": {
         "phpunit/phpunit": "3.7.27"
+    },
+    "autoload": {
+        "psr-0": {
+            "Opendi": "src/"
+        }
     }
 }
