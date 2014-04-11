@@ -47,7 +47,10 @@ class SolrSelect extends SolrExpression {
 
     private $indent = false;
     private $format = null;
+
+    private $start = null;
     private $rows = null;
+
     private $debug = false;
 
     private $raw = null;
@@ -107,6 +110,11 @@ class SolrSelect extends SolrExpression {
 
     public function raw($raw) {
         $this->raw = $raw;
+        return $this;
+    }
+
+    public function start($start = 0) {
+        $this->start = $start;
         return $this;
     }
 
@@ -175,6 +183,10 @@ class SolrSelect extends SolrExpression {
 
         if (is_numeric($this->rows)) {
             $query .= '&rows='.$this->rows;
+        }
+
+        if (is_numeric($this->start)) {
+            $query .= '&start='.$this->start;
         }
 
         $filters = implode('&', $this->filters);

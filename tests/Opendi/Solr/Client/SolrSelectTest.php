@@ -65,6 +65,12 @@ class SolrSelectTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('q=name:opendi&indent=true', $select->get());
     }
 
+    public function testStart() {
+        $select = new SolrSelect();
+        $select->indent()->rows(20)->start(10)->search('opendi', 'name');
+        $this->assertEquals('q=name:opendi&indent=true&rows=20&start=10', $select->get());
+    }
+
     public function testFormat() {
         $select = new SolrSelect();
         $select->indent()->format(SolrSelect::FORMAT_JSON)->search('opendi', 'name');
