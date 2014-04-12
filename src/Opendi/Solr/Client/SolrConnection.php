@@ -54,8 +54,18 @@ class SolrConnection
         return $this->execute('select', $select->get());
     }
 
-    public function execute($command, $query) {
+    public function update(SolrUpdate $update) {
+        return $this->execute('update/json', $update->get(), $update->getBody());
+    }
+
+    public function execute($command, $query, $body = null) {
         curl_setopt($this->curlHandle, CURLOPT_URL, $this->endpoint . $command . '/?' . $query);
+
+        if ($body != null) {
+            curl_setopt($this->curlHandle, CURLOPT_HTTPHEADER,     array('Content-type:application/json'));
+            curl_setopt($this->curlHandle, CURLOPT_POST, 1);
+            curl_setopt($this->curlHandle, CURLOPT_POSTFIELDS, $body);
+        }
 
         if (!$result = curl_exec($this->curlHandle)) {
             throw new SolrException(curl_error($this->curlHandle));
