@@ -29,6 +29,10 @@ class SolrFacetTest extends \PHPUnit_Framework_TestCase {
         $filter = new SolrFacet();
         $filter->addField('category')->addField('test');
         $this->assertEquals('facet=true&facet.field=category&facet.field=test', $filter->get());
+
+        $filter = new SolrFacet();
+        $filter->addField('category')->addField('test')->prefix('A');
+        $this->assertEquals('facet=true&facet.prefix=A&facet.field=category&facet.field=test', $filter->get());
     }
 
 }

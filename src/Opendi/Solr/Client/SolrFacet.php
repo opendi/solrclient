@@ -22,6 +22,12 @@ class SolrFacet {
     private $limit = null;
     private $fields = [];
 
+    private $prefix = null;
+
+    public function prefix($prefix) {
+        $this->prefix = $prefix;
+    }
+
     public function minCount($minCount) {
         $this->minCount = $minCount;
         return $this;
@@ -53,6 +59,10 @@ class SolrFacet {
 
         if ($this->limit != null) {
             $result .= '&facet.limit=' . $this->limit;
+        }
+
+        if ($this->prefix != null) {
+            $result .= '&facet.prefix=' . $this->prefix;
         }
 
         $result .=  '&facet.field=' . implode('&facet.field=', $this->fields);
