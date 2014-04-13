@@ -28,6 +28,7 @@ class SolrUpdate extends SolrExpression {
 
     public function body($body) {
         $this->body = $body;
+        return $this;
     }
 
     public function get() {
