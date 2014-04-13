@@ -65,6 +65,10 @@ class SolrConnection
             curl_setopt($this->curlHandle, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
             curl_setopt($this->curlHandle, CURLOPT_POST, 1);
             curl_setopt($this->curlHandle, CURLOPT_POSTFIELDS, $body);
+
+            curl_setopt($this->curlHandle, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($this->curlHandle, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+            curl_setopt($this->curlHandle, CURLINFO_HEADER_OUT, 1);
         }
 
         if (!$result = curl_exec($this->curlHandle)) {
