@@ -59,7 +59,7 @@ class SolrConnection
     }
 
     public function execute($command, $query, $body = null) {
-        curl_setopt($this->curlHandle, CURLOPT_URL, $this->endpoint . $command . '/?' . $query);
+        curl_setopt($this->curlHandle, CURLOPT_URL, $this->endpoint . $command . '?' . $query);
 
         if ($body != null) {
             curl_setopt($this->curlHandle, CURLOPT_HTTPHEADER,     array('Content-type:application/json'));
