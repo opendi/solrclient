@@ -40,7 +40,7 @@ class SolrUpdate extends SolrExpression {
     }
 
     private function render() {
-        $query = '?';
+        $query = '';
 
         if ($this->commit) {
             $query .= 'commit=true';
