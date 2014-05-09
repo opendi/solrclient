@@ -18,9 +18,10 @@ namespace Opendi\Solr\Client\Tests;
 
 use Opendi\Solr\Client\SolrFilter;
 
-class SolrFilterTest extends \PHPUnit_Framework_TestCase {
-
-    public function testBasicFilters() {
+class SolrFilterTest extends \PHPUnit_Framework_TestCase
+{
+    public function testBasicFilters()
+    {
         $filter = new SolrFilter();
         $filter->filterFor('opendi', 'category');
         $this->assertEquals('fq=category:opendi', $filter->get());
@@ -36,7 +37,8 @@ class SolrFilterTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('fq=category:opendi&fq=name:test', $filter->get());
     }
 
-    public function testFilterCaching() {
+    public function testFilterCaching()
+    {
         $filter = new SolrFilter();
         $filter->filterFor('opendi', 'category', false);
         $this->assertEquals('fq={!cache=false}category:opendi', $filter->get());

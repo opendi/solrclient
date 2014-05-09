@@ -16,6 +16,7 @@
  */
 namespace Opendi\Solr\Client;
 
-interface SolrParser {
+interface SolrParser
+{
     public function get();
-} 
+}

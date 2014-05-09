@@ -16,41 +16,51 @@
  */
 namespace Opendi\Solr\Client;
 
-class SolrFacet {
-
+class SolrFacet
+{
     private $minCount = null;
     private $limit = null;
     private $fields = [];
 
     private $prefix = null;
 
-    public function prefix($prefix) {
+    public function prefix($prefix)
+    {
         $this->prefix = $prefix;
     }
 
-    public function minCount($minCount) {
+    public function minCount($minCount)
+    {
         $this->minCount = $minCount;
+
         return $this;
     }
 
-    public function limit($limit) {
+    public function limit($limit)
+    {
         $this->limit = $limit;
+
         return $this;
     }
 
-    public function addField($field) {
+    public function addField($field)
+    {
         $this->fields[] = $field;
+
         return $this;
     }
 
-    public function get() {
+    public function get()
+    {
         if (sizeOf($this->fields) == 0) {
             throw new SolrException('Facets need at least on field to operate on');
         }
-        return (string)$this;
+
+        return (string) $this;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         $result = 'facet=true';
 
         if ($this->minCount != null) {
@@ -66,6 +76,7 @@ class SolrFacet {
         }
 
         $result .=  '&facet.field=' . implode('&facet.field=', $this->fields);
+
         return $result;
     }
-} 
+}

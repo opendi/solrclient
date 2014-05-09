@@ -18,9 +18,10 @@ namespace Opendi\Solr\Client\Tests;
 
 use Opendi\Solr\Client\SolrExtendedDismaxParser;
 
-class SolrExtendedDismaxParserTest extends \PHPUnit_Framework_TestCase {
-
-    public function testDismaxBasic() {
+class SolrExtendedDismaxParserTest extends \PHPUnit_Framework_TestCase
+{
+    public function testDismaxBasic()
+    {
         $parser  = new SolrExtendedDismaxParser();
         $this->assertEquals('defType=edismax', $parser->get());
     }

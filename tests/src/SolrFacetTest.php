@@ -18,8 +18,10 @@ namespace Opendi\Solr\Client\Tests;
 
 use Opendi\Solr\Client\SolrFacet;
 
-class SolrFacetTest extends \PHPUnit_Framework_TestCase {
-    public function testBasicFacet() {
+class SolrFacetTest extends \PHPUnit_Framework_TestCase
+{
+    public function testBasicFacet()
+    {
         $filter = new SolrFacet();
         $filter->addField('category');
         $this->assertEquals('facet=true&facet.field=category', $filter->get());

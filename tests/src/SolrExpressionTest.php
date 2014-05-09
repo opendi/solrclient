@@ -19,9 +19,10 @@ namespace Opendi\Solr\Client\Tests;
 use Opendi\Solr\Client\SolrExpression;
 use Opendi\Solr\Client\SolrSelect;
 
-class SolrExpressionTest extends \PHPUnit_Framework_TestCase {
-
-    public function testBasicSearch() {
+class SolrExpressionTest extends \PHPUnit_Framework_TestCase
+{
+    public function testBasicSearch()
+    {
         $select = new SolrExpression();
         $select->search('opendi', 'name');
         $this->assertEquals('name:opendi', $select->get());

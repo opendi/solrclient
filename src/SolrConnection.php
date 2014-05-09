@@ -16,7 +16,6 @@
  */
 namespace Opendi\Solr\Client;
 
-
 class SolrConnection
 {
     private $config;
@@ -24,7 +23,7 @@ class SolrConnection
 
     private $curlHandle;
 
-    function __construct($config)
+    public function __construct($config)
     {
         if ($config == null) {
             throw new SolrException("Configuration must not be null");
@@ -50,15 +49,18 @@ class SolrConnection
         curl_setopt($this->curlHandle, CURLOPT_HEADER, 0);
     }
 
-    public function select(SolrSelect $select) {
+    public function select(SolrSelect $select)
+    {
         return $this->execute('select', $select->get());
     }
 
-    public function update(SolrUpdate $update) {
+    public function update(SolrUpdate $update)
+    {
         return $this->execute('update/json', $update->get(), $update->getBody());
     }
 
-    public function execute($command, $query, $body = null) {
+    public function execute($command, $query, $body = null)
+    {
         curl_setopt($this->curlHandle, CURLOPT_URL, $this->endpoint . $command . '?' . $query);
 
         if ($body != null) {
@@ -74,10 +76,12 @@ class SolrConnection
         if (!$result = curl_exec($this->curlHandle)) {
             throw new SolrException(curl_error($this->curlHandle));
         }
+
         return $result;
     }
 
-    public function disconnect() {
+    public function disconnect()
+    {
         curl_close($this->curlHandle);
     }
 }

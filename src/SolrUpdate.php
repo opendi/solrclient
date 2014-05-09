@@ -16,30 +16,37 @@
  */
 namespace Opendi\Solr\Client;
 
-class SolrUpdate extends SolrExpression {
-
+class SolrUpdate extends SolrExpression
+{
     private $commit = false;
     private $body;
 
-    public function commit() {
+    public function commit()
+    {
         $this->commit = true;
+
         return $this;
     }
 
-    public function body($body) {
+    public function body($body)
+    {
         $this->body = $body;
+
         return $this;
     }
 
-    public function get() {
-        return (string)$this->render();
+    public function get()
+    {
+        return (string) $this->render();
     }
 
-    public function getBody() {
+    public function getBody()
+    {
         return $this->body;
     }
 
-    private function render() {
+    private function render()
+    {
         $query = '';
 
         if ($this->commit) {
@@ -48,4 +55,4 @@ class SolrUpdate extends SolrExpression {
 
         return $query;
     }
-} 
+}

@@ -26,8 +26,8 @@ namespace Opendi\Solr\Client;
  * Class SolrSelect
  * @package opendi\solrclient
  */
-class SolrSelect extends SolrExpression {
-
+class SolrSelect extends SolrExpression
+{
     const FORMAT_JSON = 'json';
     const FORMAT_XML = 'xml';
     const FORMAT_RUBY = 'ruby';
@@ -58,63 +58,87 @@ class SolrSelect extends SolrExpression {
     /** @var SolrParser */
     private $parser = null;
 
-    public function andExpression(SolrExpression $expression) {
+    public function andExpression(SolrExpression $expression)
+    {
         $this->andExpressions[] = $expression;
+
         return $this;
     }
 
-    public function orExpression(SolrExpression $expression) {
+    public function orExpression(SolrExpression $expression)
+    {
         $this->orExpressions[] = $expression;
+
         return $this;
     }
 
-    public function queryField($fieldName) {
+    public function queryField($fieldName)
+    {
         $this->queryFields[] = $fieldName;
+
         return $this;
     }
 
-    public function indent() {
+    public function indent()
+    {
         $this->indent = true;
+
         return $this;
     }
 
-    public function debug() {
+    public function debug()
+    {
         $this->debug = true;
+
         return $this;
     }
 
-    public function rows($max) {
+    public function rows($max)
+    {
         $this->rows = $max;
+
         return $this;
     }
 
-    public function format($format) {
+    public function format($format)
+    {
         $this->format = $format;
+
         return $this;
     }
 
-    public function filter(SolrFilter $filter) {
+    public function filter(SolrFilter $filter)
+    {
         $this->filters[] = $filter;
+
         return $this;
     }
 
-    public function facet(SolrFacet $facet) {
+    public function facet(SolrFacet $facet)
+    {
         $this->facet = $facet;
+
         return $this;
     }
 
-    public function addComponents($component) {
+    public function addComponents($component)
+    {
         $this->components[] = $component;
+
         return $this;
     }
 
-    public function raw($raw) {
+    public function raw($raw)
+    {
         $this->raw = $raw;
+
         return $this;
     }
 
-    public function start($start = 0) {
+    public function start($start = 0)
+    {
         $this->start = $start;
+
         return $this;
     }
 
@@ -124,19 +148,24 @@ class SolrSelect extends SolrExpression {
      * @param SolrParser $parser
      * @return $this
      */
-    public function parser(SolrParser $parser) {
+    public function parser(SolrParser $parser)
+    {
         $this->parser = $parser;
+
         return $this;
     }
 
-    public function get() {
+    public function get()
+    {
         if (sizeOf($this->queryAnd) == 0 && sizeOf($this->andExpressions) == 0) {
             throw new SolrException('At least one search query must be given. If you want to select all, try *');
         }
-        return (string)$this->render();
+
+        return (string) $this->render();
     }
 
-    private function render() {
+    private function render()
+    {
         $query = 'q=';
 
         $query .= parent::get();
@@ -204,4 +233,4 @@ class SolrSelect extends SolrExpression {
 
         return $query;
     }
-} 
+}

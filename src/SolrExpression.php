@@ -16,12 +16,13 @@
  */
 namespace Opendi\Solr\Client;
 
-class SolrExpression {
-
+class SolrExpression
+{
     protected $queryAnd = [];
     protected $queryOr = [];
 
-    public function search($term, $in = null) {
+    public function search($term, $in = null)
+    {
         $value = '';
         if ($in != null) {
             $value .=  $in . ':' . $term;
@@ -29,14 +30,17 @@ class SolrExpression {
             $value = $term;
         }
         $this->queryAnd[] = $value;
+
         return $this;
     }
 
-    public function andSearch($term, $in = null) {
+    public function andSearch($term, $in = null)
+    {
         return $this->search($term, $in);
     }
 
-    public function orSearch($term, $in = null) {
+    public function orSearch($term, $in = null)
+    {
         $value = '';
         if ($in != null) {
             $value .=  $in . ':' . $term;
@@ -44,14 +48,17 @@ class SolrExpression {
             $value = $term;
         }
         $this->queryOr[] = $value;
+
         return $this;
     }
 
-    public function get() {
+    public function get()
+    {
         return $this->render();
     }
 
-    private function render() {
+    private function render()
+    {
         $result = implode('%20AND%20', $this->queryAnd);
 
         if (sizeOf($this->queryAnd) > 0 && sizeOf($this->queryOr) > 0) {
@@ -61,4 +68,4 @@ class SolrExpression {
 
         return $result;
     }
-} 
+}
