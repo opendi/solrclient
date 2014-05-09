@@ -14,7 +14,9 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client;
+namespace Opendi\Solr\Client\Tests;
+
+use Opendi\Solr\Client\SolrFacet;
 
 class SolrFacetTest extends \PHPUnit_Framework_TestCase {
     public function testBasicFacet() {
@@ -36,4 +38,3 @@ class SolrFacetTest extends \PHPUnit_Framework_TestCase {
     }
 
 }
- 

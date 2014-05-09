@@ -14,7 +14,10 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client;
+namespace Opendi\Solr\Client\Tests;
+
+use Opendi\Solr\Client\SolrExpression;
+use Opendi\Solr\Client\SolrSelect;
 
 class SolrExpressionTest extends \PHPUnit_Framework_TestCase {
 
@@ -72,4 +75,3 @@ class SolrExpressionTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('q=name:opendi%20AND%20categories:services%20OR%20categories:localsearch%20AND%20(world:hello%20AND%20xxx:aaa)%20OR%20(321:123)', $select->get());
     }
 }
- 

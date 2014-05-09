@@ -14,7 +14,13 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client;
+namespace Opendi\Solr\Client\Tests;
+
+use Opendi\Solr\Client\SolrDismaxParser;
+use Opendi\Solr\Client\SolrExtendedDismaxParser;
+use Opendi\Solr\Client\SolrFacet;
+use Opendi\Solr\Client\SolrFilter;
+use Opendi\Solr\Client\SolrSelect;
 
 class SolrSelectTest extends \PHPUnit_Framework_TestCase {
 
@@ -144,4 +150,3 @@ class SolrSelectTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('q=name:opendi&defType=edismax&debug=true', $select->get());
     }
 }
- 

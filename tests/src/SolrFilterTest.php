@@ -14,7 +14,9 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client;
+namespace Opendi\Solr\Client\Tests;
+
+use Opendi\Solr\Client\SolrFilter;
 
 class SolrFilterTest extends \PHPUnit_Framework_TestCase {
 
@@ -56,4 +58,3 @@ class SolrFilterTest extends \PHPUnit_Framework_TestCase {
     }
 
 }
- 

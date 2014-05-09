@@ -16,8 +16,13 @@
          "php": ">=5.4.0"
      },
     "autoload": {
-        "psr-0": {
-            "Opendi": "src/"
+        "psr-4": {
+            "Opendi\\Solr\\Client\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Opendi\\Solr\\Client\\Tests\\": "tests/src/"
         }
     }
 }
