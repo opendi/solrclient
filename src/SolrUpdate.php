@@ -35,17 +35,12 @@ class SolrUpdate extends SolrExpression
         return $this;
     }
 
-    public function get()
-    {
-        return (string) $this->render();
-    }
-
     public function getBody()
     {
         return $this->body;
     }
 
-    private function render()
+    public function render()
     {
         $query = '';
 

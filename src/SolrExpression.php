@@ -52,12 +52,7 @@ class SolrExpression
         return $this;
     }
 
-    public function get()
-    {
-        return $this->render();
-    }
-
-    private function render()
+    public function render()
     {
         $result = implode('%20AND%20', $this->queryAnd);
 
@@ -67,5 +62,14 @@ class SolrExpression
         $result .= implode('%20OR%20', $this->queryOr);
 
         return $result;
+    }
+
+    public function __toString()
+    {
+        try {
+            return $this->render();
+        } catch (\Exception $ex) {
+            return "ERROR: " . $ex->getMessage();
+        }
     }
 }

@@ -50,17 +50,12 @@ class SolrFacet
         return $this;
     }
 
-    public function get()
+    public function render()
     {
-        if (sizeOf($this->fields) == 0) {
+        if (empty($this->fields)) {
             throw new SolrException('Facets need at least on field to operate on');
         }
 
-        return (string) $this;
-    }
-
-    public function __toString()
-    {
         $result = 'facet=true';
 
         if ($this->minCount != null) {
@@ -78,5 +73,14 @@ class SolrFacet
         $result .=  '&facet.field=' . implode('&facet.field=', $this->fields);
 
         return $result;
+    }
+
+    public function __toString()
+    {
+        try {
+            return $this->render();
+        } catch (\Exception $ex) {
+            return "ERROR: " . $ex->getMessage();
+        }
     }
 }

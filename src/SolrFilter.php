@@ -32,12 +32,7 @@ class SolrFilter
         return $this;
     }
 
-    public function get()
-    {
-        return (string) $this;
-    }
-
-    public function __toString()
+    public function render()
     {
         $prefixed = [];
         foreach ($this->filters as $filter) {
@@ -45,5 +40,10 @@ class SolrFilter
         }
 
         return implode('&', $prefixed);
+    }
+
+    public function __toString()
+    {
+        return $this->render();
     }
 }

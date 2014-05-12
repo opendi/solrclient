@@ -47,17 +47,11 @@ class SolrConnectionTest extends \PHPUnit_Framework_TestCase
     {
         $baseUrl = "http://localhost:8983/solr/entries/";
 
-        // Mock request and response objects
-        $response = m::mock('GuzzleHttp\\Message\\Response');
-        $response->shouldReceive('getBody')
-            ->once()
-            ->with(true)
-            ->andReturn("Mock response body.");
-
+        // Mock request objects
         $request = m::mock('GuzzleHttp\\Message\\Request');
-        $request->shouldReceive('send')
+        $request->shouldReceive('getBody')
             ->once()
-            ->andReturn($response);
+            ->andReturn("Mock response body.");
 
         // Mock Guzzle client
         $guzzle = m::mock('GuzzleHttp\\Client');
@@ -83,16 +77,10 @@ class SolrConnectionTest extends \PHPUnit_Framework_TestCase
         $body = '{ "id": 1 }';
 
         // Mock request and response objects
-        $response = m::mock('GuzzleHttp\\Message\\Response');
-        $response->shouldReceive('getBody')
-            ->once()
-            ->with(true)
-            ->andReturn("Mock response body.");
-
         $request = m::mock('GuzzleHttp\\Message\\Request');
-        $request->shouldReceive('send')
+        $request->shouldReceive('getBody')
             ->once()
-            ->andReturn($response);
+            ->andReturn("Mock response body.");
 
         // Mock Guzzle client
         $guzzle = m::mock('GuzzleHttp\\Client');

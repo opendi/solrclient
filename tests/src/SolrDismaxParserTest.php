@@ -23,6 +23,6 @@ class SolrDismaxParserTest extends \PHPUnit_Framework_TestCase
     public function testDismaxBasic()
     {
         $parser  = new SolrDismaxParser();
-        $this->assertEquals('defType=dismax', $parser->get());
+        $this->assertEquals('defType=dismax', $parser->render());
     }
 }

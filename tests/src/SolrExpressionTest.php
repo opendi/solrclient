@@ -25,15 +25,15 @@ class SolrExpressionTest extends \PHPUnit_Framework_TestCase
     {
         $select = new SolrExpression();
         $select->search('opendi', 'name');
-        $this->assertEquals('name:opendi', $select->get());
+        $this->assertEquals('name:opendi', $select->render());
 
         $select = new SolrExpression();
         $select->search('(opendi OR test)', 'name');
-        $this->assertEquals('name:(opendi OR test)', $select->get());
+        $this->assertEquals('name:(opendi OR test)', $select->render());
 
         $select = new SolrExpression();
         $select->search('opendi', 'name')->andSearch('services', 'categories');
-        $this->assertEquals('name:opendi%20AND%20categories:services', $select->get());
+        $this->assertEquals('name:opendi%20AND%20categories:services', $select->render());
 
         $select = new SolrSelect();
         $select
@@ -45,7 +45,7 @@ class SolrExpressionTest extends \PHPUnit_Framework_TestCase
         $expression->search('hello', 'world');
         $select->andExpression($expression);
 
-        $this->assertEquals('q=name:opendi%20AND%20categories:services%20OR%20categories:localsearch%20AND%20(world:hello)', $select->get());
+        $this->assertEquals('q=name:opendi%20AND%20categories:services%20OR%20categories:localsearch%20AND%20(world:hello)', $select->render());
 
         $select = new SolrSelect();
         $select
@@ -57,7 +57,7 @@ class SolrExpressionTest extends \PHPUnit_Framework_TestCase
         $expression->search('hello', 'world')->andSearch('aaa', 'xxx');
         $select->andExpression($expression);
 
-        $this->assertEquals('q=name:opendi%20AND%20categories:services%20OR%20categories:localsearch%20AND%20(world:hello%20AND%20xxx:aaa)', $select->get());
+        $this->assertEquals('q=name:opendi%20AND%20categories:services%20OR%20categories:localsearch%20AND%20(world:hello%20AND%20xxx:aaa)', $select->render());
 
         $select = new SolrSelect();
         $select
@@ -73,6 +73,6 @@ class SolrExpressionTest extends \PHPUnit_Framework_TestCase
         $expression->search('123', '321');
         $select->orExpression($expression);
 
-        $this->assertEquals('q=name:opendi%20AND%20categories:services%20OR%20categories:localsearch%20AND%20(world:hello%20AND%20xxx:aaa)%20OR%20(321:123)', $select->get());
+        $this->assertEquals('q=name:opendi%20AND%20categories:services%20OR%20categories:localsearch%20AND%20(world:hello%20AND%20xxx:aaa)%20OR%20(321:123)', $select->render());
     }
 }

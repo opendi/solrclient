@@ -21,15 +21,15 @@ class SolrExtendedDismaxParser implements SolrParser
 {
     private $type = 'edismax';
 
-    public function get()
-    {
-        return (string) $this;
-    }
-
-    public function __toString()
+    public function render()
     {
         $result = 'defType=' . $this->type;
 
         return $result;
+    }
+
+    public function __toString()
+    {
+        return $this->render();
     }
 }

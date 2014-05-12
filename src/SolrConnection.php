@@ -33,21 +33,19 @@ class SolrConnection
 
     public function select(SolrSelect $select)
     {
-        $url = "select?" . $select->get();
+        $url = "select?" . $select->render();
 
-        $request = $this->guzzle->get($url);
-        $response = $request->send();
-        return $response->getBody(true);
+        $response = $this->guzzle->get($url);
+        return (string) $response->getBody(true);
     }
 
     public function update(SolrUpdate $update)
     {
-        $url = "update/json?" . $update->get();
+        $url = "update/json?" . $update->render();
 
-        $request = $this->guzzle->post($url, [
+        $response = $this->guzzle->post($url, [
             'body' => $update->getBody()
         ]);
-        $response = $request->send();
-        return $response->getBody(true);
+        return (string) $response->getBody(true);
     }
 }

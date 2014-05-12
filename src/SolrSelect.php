@@ -155,20 +155,11 @@ class SolrSelect extends SolrExpression
         return $this;
     }
 
-    public function get()
-    {
-        if (sizeOf($this->queryAnd) == 0 && sizeOf($this->andExpressions) == 0) {
-            throw new SolrException('At least one search query must be given. If you want to select all, try *');
-        }
-
-        return (string) $this->render();
-    }
-
-    private function render()
+    public function render()
     {
         $query = 'q=';
 
-        $query .= parent::get();
+        $query .= parent::render();
 
         if (sizeOf($this->andExpressions)) {
             /** @var SolrExpression $expression */
@@ -176,7 +167,7 @@ class SolrSelect extends SolrExpression
                 if ($query != 'q=') {
                     $query .= '%20AND%20';
                 }
-                $query .= '(' . $expression->get() . ')';
+                $query .= '(' . $expression->render() . ')';
             }
         }
 
@@ -186,7 +177,7 @@ class SolrSelect extends SolrExpression
                 if ($query != 'q=') {
                     $query .= '%20OR%20';
                 }
-                $query .= '(' . $expression->get() . ')';
+                $query .= '(' . $expression->render() . ')';
             }
         }
 
@@ -195,7 +186,7 @@ class SolrSelect extends SolrExpression
         }
 
         if ($this->parser != null) {
-            $query .= '&' . $this->parser->get();
+            $query .= '&' . $this->parser->render();
         }
 
         if ($this->format != null) {
@@ -224,7 +215,7 @@ class SolrSelect extends SolrExpression
         }
 
         if ($this->facet != null) {
-            $query .= '&'. $this->facet->get();
+            $query .= '&'. $this->facet->render();
         }
 
         if ($this->raw != null) {
@@ -232,5 +223,10 @@ class SolrSelect extends SolrExpression
         }
 
         return $query;
+    }
+
+    public function __toString()
+    {
+        return $this->render();
     }
 }
