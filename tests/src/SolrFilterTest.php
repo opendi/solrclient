@@ -14,46 +14,49 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client;
+namespace Opendi\Solr\Client\Tests;
 
-class SolrFilterTest extends \PHPUnit_Framework_TestCase {
+use Opendi\Solr\Client\SolrFilter;
 
-    public function testBasicFilters() {
+class SolrFilterTest extends \PHPUnit_Framework_TestCase
+{
+    public function testBasicFilters()
+    {
         $filter = new SolrFilter();
         $filter->filterFor('opendi', 'category');
-        $this->assertEquals('fq=category:opendi', $filter->get());
+        $this->assertEquals('fq=category:opendi', $filter->render());
 
         $filter = new SolrFilter();
         $filter->filterFor('opendi', 'category');
         $filter->filterFor('test', 'name');
-        $this->assertEquals('fq=category:opendi&fq=name:test', $filter->get());
+        $this->assertEquals('fq=category:opendi&fq=name:test', $filter->render());
 
         $filter = new SolrFilter();
         $filter->filterFor('opendi', 'category');
         $filter->filterFor('test', 'name');
-        $this->assertEquals('fq=category:opendi&fq=name:test', $filter->get());
+        $this->assertEquals('fq=category:opendi&fq=name:test', $filter->render());
     }
 
-    public function testFilterCaching() {
+    public function testFilterCaching()
+    {
         $filter = new SolrFilter();
         $filter->filterFor('opendi', 'category', false);
-        $this->assertEquals('fq={!cache=false}category:opendi', $filter->get());
+        $this->assertEquals('fq={!cache=false}category:opendi', $filter->render());
 
         $filter = new SolrFilter();
         $filter->filterFor('opendi', 'category');
         $filter->filterFor('test', 'name', false);
-        $this->assertEquals('fq=category:opendi&fq={!cache=false}name:test', $filter->get());
+        $this->assertEquals('fq=category:opendi&fq={!cache=false}name:test', $filter->render());
 
         $filter = new SolrFilter();
         $filter->filterFor('opendi', 'category', false);
         $filter->filterFor('test', 'name');
-        $this->assertEquals('fq={!cache=false}category:opendi&fq=name:test', $filter->get());
+        $this->assertEquals('fq={!cache=false}category:opendi&fq=name:test', $filter->render());
 
         $filter = new SolrFilter();
         $filter->filterFor('opendi', 'category', false);
         $filter->filterFor('test', 'name', false);
-        $this->assertEquals('fq={!cache=false}category:opendi&fq={!cache=false}name:test', $filter->get());
+        $this->assertEquals('fq={!cache=false}category:opendi&fq={!cache=false}name:test', $filter->render());
     }
 
 }
- 

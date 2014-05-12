@@ -16,6 +16,20 @@
  */
 namespace Opendi\Solr\Client;
 
-interface SolrParser {
-    public function get();
-} 
+// TODO rest of supported fields
+class SolrDismaxParser implements SolrParser
+{
+    private $type = 'dismax';
+
+    public function render()
+    {
+        $result = 'defType=' . $this->type;
+
+        return $result;
+    }
+
+    public function __toString()
+    {
+        return $this->render();
+    }
+}
