@@ -1,4 +1,5 @@
-/vendor
-/tmp
 /composer.phar
+/target
+/tmp
+/vendor
 php_errors.log
