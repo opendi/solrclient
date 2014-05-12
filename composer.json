@@ -1,20 +1,25 @@
 {
     "name": "opendi/solrclient",
-     "type": "library",
-     "description": "Client for Apache Solr",
-     "keywords": ["solr"],
-     "homepage": "https://github.com/opendi/solrclient",
-     "authors": [
-         {
-             "name": "Opendi AG",
-             "email": "info@opendi.com",
-             "homepage": "http://www.opendi.com/",
-             "role": "Developer"
-         }
-     ],
-     "require": {
-         "php": ">=5.4.0"
-     },
+    "type": "library",
+    "description": "Client for Apache Solr",
+    "keywords": ["solr"],
+    "homepage": "https://github.com/opendi/solrclient",
+    "authors": [
+        {
+            "name": "Opendi AG",
+            "email": "info@opendi.com",
+            "homepage": "http://www.opendi.com/",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "guzzlehttp/guzzle": "4.*",
+        "symfony/config": "2.4.*"
+    },
+    "require-dev": {
+        "mockery/mockery": "*"
+    },
     "autoload": {
         "psr-4": {
             "Opendi\\Solr\\Client\\": "src/"

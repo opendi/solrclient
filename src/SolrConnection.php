@@ -18,70 +18,36 @@ namespace Opendi\Solr\Client;
 
 class SolrConnection
 {
-    private $config;
-    private $endpoint;
+    private $guzzle;
 
-    private $curlHandle;
-
-    public function __construct($config)
+    public function __construct(\GuzzleHttp\Client $guzzle)
     {
-        if ($config == null) {
-            throw new SolrException("Configuration must not be null");
+        $this->guzzle = $guzzle;
+
+        // Check a base url has been set
+        $base = $this->guzzle->getBaseUrl();
+        if (empty($base)) {
+            throw new SolrException("You need to set a base_url on Guzzle client.");
         }
-
-        if (is_array($config)) {
-            if (!isset($config['endpoint'])) {
-                throw new SolrException("Configuration must not be null");
-            }
-            $this->endpoint = $config['endpoint'];
-            $this->config = $config;
-        } else {
-            $this->endpoint = $config;
-            $this->config = [ "endpoint" => $config ];
-        }
-    }
-
-    public function connect()
-    {
-        $this->curlHandle = curl_init();
-
-        curl_setopt($this->curlHandle, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->curlHandle, CURLOPT_HEADER, 0);
     }
 
     public function select(SolrSelect $select)
     {
-        return $this->execute('select', $select->get());
+        $url = "select?" . $select->get();
+
+        $request = $this->guzzle->get($url);
+        $response = $request->send();
+        return $response->getBody(true);
     }
 
     public function update(SolrUpdate $update)
     {
-        return $this->execute('update/json', $update->get(), $update->getBody());
-    }
+        $url = "update/json?" . $update->get();
 
-    public function execute($command, $query, $body = null)
-    {
-        curl_setopt($this->curlHandle, CURLOPT_URL, $this->endpoint . $command . '?' . $query);
-
-        if ($body != null) {
-            curl_setopt($this->curlHandle, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-            curl_setopt($this->curlHandle, CURLOPT_POST, 1);
-            curl_setopt($this->curlHandle, CURLOPT_POSTFIELDS, $body);
-
-            curl_setopt($this->curlHandle, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($this->curlHandle, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-            curl_setopt($this->curlHandle, CURLINFO_HEADER_OUT, 1);
-        }
-
-        if (!$result = curl_exec($this->curlHandle)) {
-            throw new SolrException(curl_error($this->curlHandle));
-        }
-
-        return $result;
-    }
-
-    public function disconnect()
-    {
-        curl_close($this->curlHandle);
+        $request = $this->guzzle->post($url, [
+            'body' => $update->getBody()
+        ]);
+        $response = $request->send();
+        return $response->getBody(true);
     }
 }
