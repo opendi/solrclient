@@ -23,20 +23,129 @@ class SolrFacetTest extends \PHPUnit_Framework_TestCase
     public function testBasicFacet()
     {
         $filter = new SolrFacet();
-        $filter->addField('category');
+        $filter->field('category');
         $this->assertEquals('facet=true&facet.field=category', $filter->render());
 
         $filter = new SolrFacet();
-        $filter->addField('category')->minCount(1)->limit(5);
-        $this->assertEquals('facet=true&facet.mincount=1&facet.limit=5&facet.field=category', $filter->render());
+        $filter->field('category')->minCount(1)->limit(5);
+        $this->assertEquals('facet=true&facet.field=category&facet.mincount=1&facet.limit=5', $filter->render());
 
         $filter = new SolrFacet();
-        $filter->addField('category')->addField('test');
+        $filter->field('category')->field('test');
         $this->assertEquals('facet=true&facet.field=category&facet.field=test', $filter->render());
 
         $filter = new SolrFacet();
-        $filter->addField('category')->addField('test')->prefix('A');
-        $this->assertEquals('facet=true&facet.prefix=A&facet.field=category&facet.field=test', $filter->render());
+        $filter->field('category')->field('test')->prefix('A');
+        $this->assertEquals('facet=true&facet.field=category&facet.field=test&facet.prefix=A', $filter->render());
     }
 
+    public function testSort()
+    {
+        $actual = SolrFacet::instance()->field('foo')->sort('index')->render();
+        $expected = "facet=true&facet.field=foo&facet.sort=index";
+        $this->assertSame($expected, $actual);
+
+        $actual = SolrFacet::instance()->field('foo')->sort('index', 'foo')->render();
+        $expected = "facet=true&facet.field=foo&f.foo.facet.sort=index";
+        $this->assertSame($expected, $actual);
+
+        $actual = SolrFacet::instance()->field('foo')->sortByIndex()->render();
+        $expected = "facet=true&facet.field=foo&facet.sort=index";
+        $this->assertSame($expected, $actual);
+
+        $actual = SolrFacet::instance()->field('foo')->sortByIndex('foo')->render();
+        $expected = "facet=true&facet.field=foo&f.foo.facet.sort=index";
+        $this->assertSame($expected, $actual);
+
+        $actual = SolrFacet::instance()->field('foo')->sortByCount()->render();
+        $expected = "facet=true&facet.field=foo&facet.sort=count";
+        $this->assertSame($expected, $actual);
+
+        $actual = SolrFacet::instance()->field('foo')->sortByCount('foo')->render();
+        $expected = "facet=true&facet.field=foo&f.foo.facet.sort=count";
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @expectedException Opendi\Solr\Client\SolrException
+     * @expectedExceptionMessage Invalid sort value "foo"
+     */
+    public function testSortInvalid()
+    {
+        SolrFacet::instance()->sort('foo');
+    }
+
+    public function testLimit()
+    {
+        $actual = SolrFacet::instance()->field('foo')->limit(10)->render();
+        $expected = "facet=true&facet.field=foo&facet.limit=10";
+        $this->assertSame($expected, $actual);
+
+        $actual = SolrFacet::instance()->field('foo')->limit(10, 'foo')->render();
+        $expected = "facet=true&facet.field=foo&f.foo.facet.limit=10";
+        $this->assertSame($expected, $actual);
+
+        $actual = SolrFacet::instance()->field('foo')->noLimit()->render();
+        $expected = "facet=true&facet.field=foo&facet.limit=-1";
+        $this->assertSame($expected, $actual);
+
+        $actual = SolrFacet::instance()->field('foo')->noLimit('foo')->render();
+        $expected = "facet=true&facet.field=foo&f.foo.facet.limit=-1";
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testOffset()
+    {
+        $actual = SolrFacet::instance()->field('foo')->offset(10)->render();
+        $expected = "facet=true&facet.field=foo&facet.offset=10";
+        $this->assertSame($expected, $actual);
+
+        $actual = SolrFacet::instance()->field('foo')->offset(10, 'foo')->render();
+        $expected = "facet=true&facet.field=foo&f.foo.facet.offset=10";
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testPivot()
+    {
+        $actual = SolrFacet::instance()->field('foo')->pivot('foo')->render();
+        $expected = "facet=true&facet.field=foo&facet.pivot=foo";
+        $this->assertSame($expected, $actual);
+
+        $actual = SolrFacet::instance()->field('foo')->pivot('foo','bar','baz')->render();
+        $expected = "facet=true&facet.field=foo&facet.pivot=" . urlencode('foo,bar,baz');
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @expectedException Opendi\Solr\Client\SolrException
+     * @expectedExceptionMessage At least one pivot field must be specified.
+     */
+    public function testPivotInvalid()
+    {
+        SolrFacet::instance()->pivot();
+    }
+
+    /**
+     * @expectedException Opendi\Solr\Client\SolrException
+     * @expectedExceptionMessage At least one facet field must be set.
+     */
+    public function testNoFieldsError()
+    {
+        SolrFacet::instance()->render();
+    }
+
+    public function testToString()
+    {
+        $actual = (string) SolrFacet::instance()->field('foo')->pivot('foo');
+        $expected = SolrFacet::instance()->field('foo')->pivot('foo')->render();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testToStringError()
+    {
+        $actual = (string) SolrFacet::instance();
+        $expected = "ERROR: At least one facet field must be set.";
+        $this->assertSame($expected, $actual);
+    }
 }

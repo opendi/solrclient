@@ -129,14 +129,14 @@ class SolrSelectTest extends \PHPUnit_Framework_TestCase
     public function testWithFacets()
     {
         $facet = new SolrFacet();
-        $facet->addField('category')->limit(1)->minCount(1);
+        $facet->field('category')->limit(1)->minCount(1);
 
         $select = new SolrSelect();
         $select
             ->search('opendi', 'name')
             ->facet($facet);
 
-        $this->assertEquals('q=name:opendi&facet=true&facet.mincount=1&facet.limit=1&facet.field=category', $select->render());
+        $this->assertEquals('q=name:opendi&facet=true&facet.field=category&facet.limit=1&facet.mincount=1', $select->render());
     }
 
     public function testDebug()

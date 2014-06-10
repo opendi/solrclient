@@ -28,6 +28,8 @@ namespace Opendi\Solr\Client;
  */
 class SolrSelect extends SolrExpression
 {
+    use InstanceTrait;
+
     const FORMAT_JSON = 'json';
     const FORMAT_XML = 'xml';
     const FORMAT_RUBY = 'ruby';
