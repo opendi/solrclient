@@ -63,13 +63,4 @@ class SolrExpression
 
         return $result;
     }
-
-    public function __toString()
-    {
-        try {
-            return $this->render();
-        } catch (\Exception $ex) {
-            return "ERROR: " . $ex->getMessage();
-        }
-    }
 }

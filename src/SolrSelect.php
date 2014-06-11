@@ -28,6 +28,8 @@ namespace Opendi\Solr\Client;
  */
 class SolrSelect extends SolrExpression
 {
+    use InstanceTrait;
+
     const FORMAT_JSON = 'json';
     const FORMAT_XML = 'xml';
     const FORMAT_RUBY = 'ruby';
@@ -209,9 +211,8 @@ class SolrSelect extends SolrExpression
             $query .= '&start='.$this->start;
         }
 
-        $filters = implode('&', $this->filters);
-        if ($filters != '') {
-            $query .= '&'.$filters;
+        foreach ($this->filters as $filter) {
+            $query .= '&' . $filter->render();
         }
 
         if ($this->facet != null) {
@@ -223,10 +224,5 @@ class SolrSelect extends SolrExpression
         }
 
         return $query;
-    }
-
-    public function __toString()
-    {
-        return $this->render();
     }
 }

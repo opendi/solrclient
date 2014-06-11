@@ -17,4 +17,4 @@
 @ini_set("display_errors", "On");
 @ini_set("display_startup_errors", "On");
 
-require './vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
