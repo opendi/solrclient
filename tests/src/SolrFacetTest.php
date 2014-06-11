@@ -124,13 +124,4 @@ class SolrFacetTest extends \PHPUnit_Framework_TestCase
     {
         SolrFacet::instance()->pivot();
     }
-
-    /**
-     * @expectedException Opendi\Solr\Client\SolrException
-     * @expectedExceptionMessage At least one facet field must be set.
-     */
-    public function testNoFieldsError()
-    {
-        SolrFacet::instance()->render();
-    }
 }
