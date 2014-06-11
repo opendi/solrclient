@@ -30,12 +30,6 @@ class SolrFacet
     ];
 
     /**
-     * Set to true the first time `$this->field()` is invoked. Used to validate
-     * the query.
-     */
-    private $isFieldSet = false;
-
-    /**
      * Holds the query separated into an array of two-value arrays.
      *
      * For example:
@@ -61,8 +55,6 @@ class SolrFacet
      */
     public function field($field)
     {
-        $this->isFieldSet = true;
-
         return $this->param('facet.field', $field);
     }
 
@@ -230,10 +222,6 @@ class SolrFacet
      */
     public function render()
     {
-        if (!$this->isFieldSet) {
-            throw new SolrException("At least one facet field must be set.");
-        }
-
         $query = [
             'facet=true'
         ];
