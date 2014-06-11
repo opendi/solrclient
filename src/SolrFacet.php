@@ -245,13 +245,4 @@ class SolrFacet
 
         return implode("&", $query);
     }
-
-    public function __toString()
-    {
-        try {
-            return $this->render();
-        } catch (\Exception $ex) {
-            return "ERROR: " . $ex->getMessage();
-        }
-    }
 }

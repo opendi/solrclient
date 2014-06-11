@@ -27,9 +27,4 @@ class SolrDismaxParser implements SolrParser
 
         return $result;
     }
-
-    public function __toString()
-    {
-        return $this->render();
-    }
 }

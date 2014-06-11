@@ -41,9 +41,4 @@ class SolrFilter
 
         return implode('&', $prefixed);
     }
-
-    public function __toString()
-    {
-        return $this->render();
-    }
 }

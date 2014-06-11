@@ -133,19 +133,4 @@ class SolrFacetTest extends \PHPUnit_Framework_TestCase
     {
         SolrFacet::instance()->render();
     }
-
-    public function testToString()
-    {
-        $actual = (string) SolrFacet::instance()->field('foo')->pivot('foo');
-        $expected = SolrFacet::instance()->field('foo')->pivot('foo')->render();
-
-        $this->assertSame($expected, $actual);
-    }
-
-    public function testToStringError()
-    {
-        $actual = (string) SolrFacet::instance();
-        $expected = "ERROR: At least one facet field must be set.";
-        $this->assertSame($expected, $actual);
-    }
 }
