@@ -16,15 +16,29 @@
  */
 namespace Opendi\Solr\Client;
 
-// TODO rest of supported fields
-class SolrExtendedDismaxParser implements SolrParser
+class Filter
 {
-    private $type = 'edismax';
+    private $filters = [];
+
+    public function filterFor($term, $in, $cache = true)
+    {
+        $param = '';
+        if (!$cache) {
+            $param = '{!cache=false}';
+        }
+
+        $this->filters[] = $param.$in . ':' . $term;
+
+        return $this;
+    }
 
     public function render()
     {
-        $result = 'defType=' . $this->type;
+        $prefixed = [];
+        foreach ($this->filters as $filter) {
+            $prefixed[] = 'fq=' . $filter;
+        }
 
-        return $result;
+        return implode('&', $prefixed);
     }
 }

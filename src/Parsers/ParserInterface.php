@@ -14,17 +14,9 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client;
+namespace Opendi\Solr\Client\Parsers;
 
-// TODO rest of supported fields
-class SolrDismaxParser implements SolrParser
+interface ParserInterface
 {
-    private $type = 'dismax';
-
-    public function render()
-    {
-        $result = 'defType=' . $this->type;
-
-        return $result;
-    }
+    public function render();
 }

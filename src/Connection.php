@@ -16,7 +16,7 @@
  */
 namespace Opendi\Solr\Client;
 
-class SolrConnection
+class Connection
 {
     private $guzzle;
 
@@ -31,7 +31,7 @@ class SolrConnection
         }
     }
 
-    public function select(SolrSelect $select)
+    public function select(Select $select)
     {
         $url = "select?" . $select->render();
 
@@ -39,7 +39,7 @@ class SolrConnection
         return (string) $response->getBody(true);
     }
 
-    public function update(SolrUpdate $update)
+    public function update(Update $update)
     {
         $url = "update/json?" . $update->render();
 

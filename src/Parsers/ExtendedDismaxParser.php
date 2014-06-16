@@ -14,31 +14,17 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client;
+namespace Opendi\Solr\Client\Parsers;
 
-class SolrFilter
+// TODO rest of supported fields
+class ExtendedDismaxParser implements ParserInterface
 {
-    private $filters = [];
-
-    public function filterFor($term, $in, $cache = true)
-    {
-        $param = '';
-        if (!$cache) {
-            $param = '{!cache=false}';
-        }
-
-        $this->filters[] = $param.$in . ':' . $term;
-
-        return $this;
-    }
+    private $type = 'edismax';
 
     public function render()
     {
-        $prefixed = [];
-        foreach ($this->filters as $filter) {
-            $prefixed[] = 'fq=' . $filter;
-        }
+        $result = 'defType=' . $this->type;
 
-        return implode('&', $prefixed);
+        return $result;
     }
 }

@@ -16,22 +16,22 @@
  */
 namespace Opendi\Solr\Client\Tests;
 
-use Opendi\Solr\Client\SolrFilter;
+use Opendi\Solr\Client\Filter;
 
-class SolrFilterTest extends \PHPUnit_Framework_TestCase
+class FilterTest extends \PHPUnit_Framework_TestCase
 {
     public function testBasicFilters()
     {
-        $filter = new SolrFilter();
+        $filter = new Filter();
         $filter->filterFor('opendi', 'category');
         $this->assertEquals('fq=category:opendi', $filter->render());
 
-        $filter = new SolrFilter();
+        $filter = new Filter();
         $filter->filterFor('opendi', 'category');
         $filter->filterFor('test', 'name');
         $this->assertEquals('fq=category:opendi&fq=name:test', $filter->render());
 
-        $filter = new SolrFilter();
+        $filter = new Filter();
         $filter->filterFor('opendi', 'category');
         $filter->filterFor('test', 'name');
         $this->assertEquals('fq=category:opendi&fq=name:test', $filter->render());
@@ -39,21 +39,21 @@ class SolrFilterTest extends \PHPUnit_Framework_TestCase
 
     public function testFilterCaching()
     {
-        $filter = new SolrFilter();
+        $filter = new Filter();
         $filter->filterFor('opendi', 'category', false);
         $this->assertEquals('fq={!cache=false}category:opendi', $filter->render());
 
-        $filter = new SolrFilter();
+        $filter = new Filter();
         $filter->filterFor('opendi', 'category');
         $filter->filterFor('test', 'name', false);
         $this->assertEquals('fq=category:opendi&fq={!cache=false}name:test', $filter->render());
 
-        $filter = new SolrFilter();
+        $filter = new Filter();
         $filter->filterFor('opendi', 'category', false);
         $filter->filterFor('test', 'name');
         $this->assertEquals('fq={!cache=false}category:opendi&fq=name:test', $filter->render());
 
-        $filter = new SolrFilter();
+        $filter = new Filter();
         $filter->filterFor('opendi', 'category', false);
         $filter->filterFor('test', 'name', false);
         $this->assertEquals('fq={!cache=false}category:opendi&fq={!cache=false}name:test', $filter->render());

@@ -16,7 +16,7 @@
  */
 namespace Opendi\Solr\Client;
 
-class SolrUpdate extends SolrExpression
+class Update extends Expression
 {
     private $commit = false;
     private $body;

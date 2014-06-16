@@ -18,11 +18,11 @@ namespace Opendi\Solr\Client\Tests;
 
 use Mockery as m;
 
-use Opendi\Solr\Client\SolrConnection;
-use Opendi\Solr\Client\SolrSelect;
-use Opendi\Solr\Client\SolrUpdate;
+use Opendi\Solr\Client\Connection;
+use Opendi\Solr\Client\Select;
+use Opendi\Solr\Client\Update;
 
-class SolrConnectionTest extends \PHPUnit_Framework_TestCase
+class ConnectionTest extends \PHPUnit_Framework_TestCase
 {
     protected function tearDown()
     {
@@ -40,7 +40,7 @@ class SolrConnectionTest extends \PHPUnit_Framework_TestCase
             ->once()
             ->andReturn(null);
 
-        $select = new SolrConnection($guzzle);
+        $select = new Connection($guzzle);
     }
 
     public function testSelect()
@@ -64,10 +64,10 @@ class SolrConnectionTest extends \PHPUnit_Framework_TestCase
             ->once()
             ->andReturn($request);
 
-        $select = new SolrSelect();
+        $select = new Select();
         $select->search('name:frank zappa');
 
-        $conn = new SolrConnection($guzzle);
+        $conn = new Connection($guzzle);
         $conn->select($select);
     }
 
@@ -93,10 +93,10 @@ class SolrConnectionTest extends \PHPUnit_Framework_TestCase
             ->once()
             ->andReturn($request);
 
-        $update = new SolrUpdate();
+        $update = new Update();
         $update->body($body);
 
-        $conn = new SolrConnection($guzzle);
+        $conn = new Connection($guzzle);
         $conn->update($update);
     }
 }

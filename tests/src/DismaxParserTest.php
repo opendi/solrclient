@@ -16,13 +16,13 @@
  */
 namespace Opendi\Solr\Client\Tests;
 
-use Opendi\Solr\Client\SolrDismaxParser;
+use Opendi\Solr\Client\Parsers\DismaxParser;
 
-class SolrDismaxParserTest extends \PHPUnit_Framework_TestCase
+class DismaxParserTest extends \PHPUnit_Framework_TestCase
 {
     public function testDismaxBasic()
     {
-        $parser  = new SolrDismaxParser();
+        $parser  = new DismaxParser();
         $this->assertEquals('defType=dismax', $parser->render());
     }
 }

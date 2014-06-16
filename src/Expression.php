@@ -16,7 +16,7 @@
  */
 namespace Opendi\Solr\Client;
 
-class SolrExpression
+class Expression
 {
     protected $queryAnd = [];
     protected $queryOr = [];

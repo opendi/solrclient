@@ -16,7 +16,7 @@
  */
 namespace Opendi\Solr\Client;
 
-class SolrFacet
+class Facet
 {
     use InstanceTrait;
 
@@ -64,7 +64,7 @@ class SolrFacet
      *
      * @param  string $prefix The prefix value.
      * @param  string $field  Name of the field to apply per-field (optional).
-     * @return SolrFacet
+     * @return Facet
      */
     public function prefix($prefix, $field = null)
     {
@@ -80,7 +80,7 @@ class SolrFacet
      *
      * @param  string $sort  Sort value ("count" or "index") .
      * @param  string $field Name of the field to apply per-field (optional).
-     * @return SolrFacet
+     * @return Facet
      */
     public function sort($sort, $field = null)
     {
@@ -125,7 +125,7 @@ class SolrFacet
      * @param  integer $limit The limit value.
      * @param  string  $field Name of the field to apply per-field (optional).
      *
-     * @return SolrFacet
+     * @return Facet
      */
     public function limit($limit, $field = null)
     {
@@ -140,7 +140,7 @@ class SolrFacet
      *
      * @param  string  $field Name of the field to apply per-field (optional).
      *
-     * @return SolrFacet
+     * @return Facet
      */
     public function noLimit($field = null)
     {
@@ -156,7 +156,7 @@ class SolrFacet
      * @param  integer $offset The offset value.
      * @param  string  $field  Name of the field to apply per-field (optional).
      *
-     * @return SolrFacet
+     * @return Facet
      */
     public function offset($offset, $field = null)
     {
@@ -175,7 +175,7 @@ class SolrFacet
      * @param  integer $minCount The mincount value.
      * @param  string  $field  Name of the field to apply per-field (optional).
      *
-     * @return SolrFacet
+     * @return Facet
      */
     public function minCount($minCount, $field = null)
     {
