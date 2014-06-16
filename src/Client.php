@@ -16,11 +16,15 @@
  */
 namespace Opendi\Solr\Client;
 
-class Connection
+use GuzzleHttp\Client as Guzzle;
+
+class Client
 {
     private $guzzle;
 
-    public function __construct(\GuzzleHttp\Client $guzzle)
+    private $cores = [];
+
+    public function __construct(Guzzle $guzzle)
     {
         $this->guzzle = $guzzle;
 
@@ -31,21 +35,22 @@ class Connection
         }
     }
 
-    public function select(Select $select)
+    /**
+     * Returns a Core object for the given core name.
+     *
+     * @param  String $name
+     * @return Core
+     */
+    public function core($name)
     {
-        $url = "select?" . $select->render();
+        if (!is_string($name) || empty($name)) {
+            throw new IllegalArgumentException("Invalid core name.");
+        }
 
-        $response = $this->guzzle->get($url);
-        return (string) $response->getBody(true);
-    }
+        if (!isset($this->cores[$name])) {
+            $this->cores[$name] = new Core($this->guzzle, $name);
+        }
 
-    public function update(Update $update)
-    {
-        $url = "update/json?" . $update->render();
-
-        $response = $this->guzzle->post($url, [
-            'body' => $update->getBody()
-        ]);
-        return (string) $response->getBody(true);
+        return $this->cores[$name];
     }
 }

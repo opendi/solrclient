@@ -18,34 +18,20 @@ namespace Opendi\Solr\Client\Tests;
 
 use Mockery as m;
 
-use Opendi\Solr\Client\Connection;
+use Opendi\Solr\Client\Client;
 use Opendi\Solr\Client\Select;
 use Opendi\Solr\Client\Update;
 
-class ConnectionTest extends \PHPUnit_Framework_TestCase
+class CoreTest extends \PHPUnit_Framework_TestCase
 {
     protected function tearDown()
     {
         m::close();
     }
 
-    /**
-     * @expectedException Opendi\Solr\Client\SolrException
-     * @expectedExceptionMessage You need to set a base_url on Guzzle client.
-     */
-    public function testFailureNoBasUrl()
-    {
-        $guzzle = m::mock('GuzzleHttp\\Client');
-        $guzzle->shouldReceive('getBaseUrl')
-            ->once()
-            ->andReturn(null);
-
-        $select = new Connection($guzzle);
-    }
-
     public function testSelect()
     {
-        $baseUrl = "http://localhost:8983/solr/entries/";
+        $baseUrl = "http://localhost:8983/solr/";
 
         // Mock request objects
         $request = m::mock('GuzzleHttp\\Message\\Request');
@@ -60,15 +46,16 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             ->andReturn($baseUrl);
 
         $guzzle->shouldReceive('get')
-            ->with("select?q=name:frank zappa")
+            ->with("entries/select?q=name:frank zappa")
             ->once()
             ->andReturn($request);
 
         $select = new Select();
         $select->search('name:frank zappa');
 
-        $conn = new Connection($guzzle);
-        $conn->select($select);
+        $client = new Client($guzzle);
+        $core = $client->core('entries');
+        $core->select($select);
     }
 
     public function testUpdate()
@@ -89,14 +76,14 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
             ->andReturn($baseUrl);
 
         $guzzle->shouldReceive('post')
-            ->with("update/json?", ['body' => $body])
+            ->with("entries/update?", ['body' => $body])
             ->once()
             ->andReturn($request);
 
         $update = new Update();
         $update->body($body);
 
-        $conn = new Connection($guzzle);
-        $conn->update($update);
+        $client = new Client($guzzle);
+        $client->core('entries')->update($update);
     }
 }
