@@ -18,8 +18,6 @@ namespace Opendi\Solr\Client;
 
 class Facet
 {
-    use InstanceTrait;
-
     const SORT_COUNT = 'count';
     const SORT_INDEX = 'index';
 

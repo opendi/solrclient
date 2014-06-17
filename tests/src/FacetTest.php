@@ -17,6 +17,7 @@
 namespace Opendi\Solr\Client\Tests;
 
 use Opendi\Solr\Client\Facet;
+use Opendi\Solr\Client\Solr;
 
 class FacetTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,27 +42,27 @@ class FacetTest extends \PHPUnit_Framework_TestCase
 
     public function testSort()
     {
-        $actual = Facet::instance()->field('foo')->sort('index')->render();
+        $actual = Solr::facet()->field('foo')->sort('index')->render();
         $expected = "facet=true&facet.field=foo&facet.sort=index";
         $this->assertSame($expected, $actual);
 
-        $actual = Facet::instance()->field('foo')->sort('index', 'foo')->render();
+        $actual = Solr::facet()->field('foo')->sort('index', 'foo')->render();
         $expected = "facet=true&facet.field=foo&f.foo.facet.sort=index";
         $this->assertSame($expected, $actual);
 
-        $actual = Facet::instance()->field('foo')->sortByIndex()->render();
+        $actual = Solr::facet()->field('foo')->sortByIndex()->render();
         $expected = "facet=true&facet.field=foo&facet.sort=index";
         $this->assertSame($expected, $actual);
 
-        $actual = Facet::instance()->field('foo')->sortByIndex('foo')->render();
+        $actual = Solr::facet()->field('foo')->sortByIndex('foo')->render();
         $expected = "facet=true&facet.field=foo&f.foo.facet.sort=index";
         $this->assertSame($expected, $actual);
 
-        $actual = Facet::instance()->field('foo')->sortByCount()->render();
+        $actual = Solr::facet()->field('foo')->sortByCount()->render();
         $expected = "facet=true&facet.field=foo&facet.sort=count";
         $this->assertSame($expected, $actual);
 
-        $actual = Facet::instance()->field('foo')->sortByCount('foo')->render();
+        $actual = Solr::facet()->field('foo')->sortByCount('foo')->render();
         $expected = "facet=true&facet.field=foo&f.foo.facet.sort=count";
         $this->assertSame($expected, $actual);
     }
@@ -72,46 +73,46 @@ class FacetTest extends \PHPUnit_Framework_TestCase
      */
     public function testSortInvalid()
     {
-        Facet::instance()->sort('foo');
+        Solr::facet()->sort('foo');
     }
 
     public function testLimit()
     {
-        $actual = Facet::instance()->field('foo')->limit(10)->render();
+        $actual = Solr::facet()->field('foo')->limit(10)->render();
         $expected = "facet=true&facet.field=foo&facet.limit=10";
         $this->assertSame($expected, $actual);
 
-        $actual = Facet::instance()->field('foo')->limit(10, 'foo')->render();
+        $actual = Solr::facet()->field('foo')->limit(10, 'foo')->render();
         $expected = "facet=true&facet.field=foo&f.foo.facet.limit=10";
         $this->assertSame($expected, $actual);
 
-        $actual = Facet::instance()->field('foo')->noLimit()->render();
+        $actual = Solr::facet()->field('foo')->noLimit()->render();
         $expected = "facet=true&facet.field=foo&facet.limit=-1";
         $this->assertSame($expected, $actual);
 
-        $actual = Facet::instance()->field('foo')->noLimit('foo')->render();
+        $actual = Solr::facet()->field('foo')->noLimit('foo')->render();
         $expected = "facet=true&facet.field=foo&f.foo.facet.limit=-1";
         $this->assertSame($expected, $actual);
     }
 
     public function testOffset()
     {
-        $actual = Facet::instance()->field('foo')->offset(10)->render();
+        $actual = Solr::facet()->field('foo')->offset(10)->render();
         $expected = "facet=true&facet.field=foo&facet.offset=10";
         $this->assertSame($expected, $actual);
 
-        $actual = Facet::instance()->field('foo')->offset(10, 'foo')->render();
+        $actual = Solr::facet()->field('foo')->offset(10, 'foo')->render();
         $expected = "facet=true&facet.field=foo&f.foo.facet.offset=10";
         $this->assertSame($expected, $actual);
     }
 
     public function testPivot()
     {
-        $actual = Facet::instance()->field('foo')->pivot('foo')->render();
+        $actual = Solr::facet()->field('foo')->pivot('foo')->render();
         $expected = "facet=true&facet.field=foo&facet.pivot=foo";
         $this->assertSame($expected, $actual);
 
-        $actual = Facet::instance()->field('foo')->pivot('foo','bar','baz')->render();
+        $actual = Solr::facet()->field('foo')->pivot('foo','bar','baz')->render();
         $expected = "facet=true&facet.field=foo&facet.pivot=" . urlencode('foo,bar,baz');
         $this->assertSame($expected, $actual);
     }
@@ -122,6 +123,6 @@ class FacetTest extends \PHPUnit_Framework_TestCase
      */
     public function testPivotInvalid()
     {
-        Facet::instance()->pivot();
+        Solr::facet()->pivot();
     }
 }

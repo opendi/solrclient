@@ -30,8 +30,6 @@ use Opendi\Solr\Client\Parsers\ParserInterface;
  */
 class Select extends Expression
 {
-    use InstanceTrait;
-
     const FORMAT_JSON = 'json';
     const FORMAT_XML = 'xml';
     const FORMAT_RUBY = 'ruby';
