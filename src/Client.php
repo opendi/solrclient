@@ -58,6 +58,30 @@ class Client
         return $this->cores[$name];
     }
 
+    public function coreStatus($name = null)
+    {
+        if (isset($name) && (!is_string($name) || empty($name))) {
+            throw new InvalidArgumentException("Invalid core name.");
+        }
+
+        $query = [
+            'action' => 'STATUS',
+            'wt' => 'json'
+        ];
+
+        if (isset($name)) {
+            $query['name'] = $name;
+        }
+
+        $query = http_build_query($query);
+
+        $url = "admin/cores?$query";
+
+        return $this->guzzle
+            ->get($url)
+            ->json();
+    }
+
     /**
      * Pings the server to check it's there.
      * @return array Solr's reply.
