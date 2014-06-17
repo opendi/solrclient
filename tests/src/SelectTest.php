@@ -21,6 +21,7 @@ use Opendi\Solr\Client\Parsers\ExtendedDismaxParser;
 use Opendi\Solr\Client\Facet;
 use Opendi\Solr\Client\Filter;
 use Opendi\Solr\Client\Select;
+use Opendi\Solr\Client\Solr;
 
 class SelectTest extends \PHPUnit_Framework_TestCase
 {
@@ -160,5 +161,15 @@ class SelectTest extends \PHPUnit_Framework_TestCase
         $select = new Select();
         $select->search('opendi', 'name')->parser($parser)->debug();
         $this->assertEquals('q=name:opendi&defType=edismax&debug=true', $select->render());
+    }
+
+    public function testFactory()
+    {
+        $select1 = Solr::select();
+        $select2 = Solr::select();
+
+        $this->assertNotSame($select1, $select2);
+        $this->assertInstanceOf(Select::class, $select1);
+        $this->assertInstanceOf(Select::class, $select2);
     }
 }
