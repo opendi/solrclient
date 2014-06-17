@@ -110,4 +110,16 @@ class Client
     {
         $this->pingHandler = $handler;
     }
+
+    /**
+     * Returns the underlying Guzzle client's event emitter.
+     *
+     * @return GuzzleHttp\Event\EmitterInterface
+     *
+     * @see  http://guzzle.readthedocs.org/en/latest/events.html
+     */
+    public function getEmitter()
+    {
+        return $this->guzzle->getEmitter();
+    }
 }
