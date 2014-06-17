@@ -18,6 +18,8 @@ namespace Opendi\Solr\Client;
 
 use GuzzleHttp\Client as Guzzle;
 
+use InvalidArgumentException;
+
 class Client
 {
     private $guzzle;
@@ -46,7 +48,7 @@ class Client
     public function core($name)
     {
         if (!is_string($name) || empty($name)) {
-            throw new IllegalArgumentException("Invalid core name.");
+            throw new InvalidArgumentException("Invalid core name.");
         }
 
         if (!isset($this->cores[$name])) {
