@@ -4,6 +4,7 @@
     "description": "Client for Apache Solr",
     "keywords": ["solr"],
     "homepage": "https://github.com/opendi/solrclient",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "Opendi AG",

@@ -14,40 +14,17 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client;
+namespace Opendi\Solr\Client\Parsers;
 
-class SolrUpdate extends SolrExpression
+// TODO rest of supported fields
+class ExtendedDismaxParser implements ParserInterface
 {
-    private $commit = false;
-    private $body;
-
-    public function commit()
-    {
-        $this->commit = true;
-
-        return $this;
-    }
-
-    public function body($body)
-    {
-        $this->body = $body;
-
-        return $this;
-    }
-
-    public function getBody()
-    {
-        return $this->body;
-    }
+    private $type = 'edismax';
 
     public function render()
     {
-        $query = '';
+        $result = 'defType=' . $this->type;
 
-        if ($this->commit) {
-            $query .= 'commit=true';
-        }
-
-        return $query;
+        return $result;
     }
 }

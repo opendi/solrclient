@@ -14,15 +14,9 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client\Tests;
+namespace Opendi\Solr\Client\Parsers;
 
-use Opendi\Solr\Client\SolrExtendedDismaxParser;
-
-class SolrExtendedDismaxParserTest extends \PHPUnit_Framework_TestCase
+interface ParserInterface
 {
-    public function testDismaxBasic()
-    {
-        $parser  = new SolrExtendedDismaxParser();
-        $this->assertEquals('defType=edismax', $parser->render());
-    }
+    public function render();
 }

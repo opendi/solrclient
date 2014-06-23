@@ -16,13 +16,28 @@
  */
 namespace Opendi\Solr\Client\Tests;
 
-use Opendi\Solr\Client\SolrDismaxParser;
+use Mockery as m;
 
-class SolrDismaxParserTest extends \PHPUnit_Framework_TestCase
+use Opendi\Solr\Client\Client;
+
+class ClientTest extends \PHPUnit_Framework_TestCase
 {
-    public function testDismaxBasic()
+    protected function tearDown()
     {
-        $parser  = new SolrDismaxParser();
-        $this->assertEquals('defType=dismax', $parser->render());
+        m::close();
+    }
+
+    /**
+     * @expectedException Opendi\Solr\Client\SolrException
+     * @expectedExceptionMessage You need to set a base_url on Guzzle client.
+     */
+    public function testFailureNoBasUrl()
+    {
+        $guzzle = m::mock('GuzzleHttp\\Client');
+        $guzzle->shouldReceive('getBaseUrl')
+            ->once()
+            ->andReturn(null);
+
+        $select = new Client($guzzle);
     }
 }

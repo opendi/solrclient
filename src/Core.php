@@ -16,36 +16,48 @@
  */
 namespace Opendi\Solr\Client;
 
-class SolrConnection
+use GuzzleHttp\Client as Guzzle;
+
+/**
+ * Functionality which can be invoked on a Solr core.
+ */
+class Core
 {
+    /**
+     * @var GuzzleHttp\Client
+     */
     private $guzzle;
 
-    public function __construct(\GuzzleHttp\Client $guzzle)
+    /**
+     * Name of the core.
+     */
+    private $name;
+
+    public function __construct(Guzzle $guzzle, $name)
     {
         $this->guzzle = $guzzle;
-
-        // Check a base url has been set
-        $base = $this->guzzle->getBaseUrl();
-        if (empty($base)) {
-            throw new SolrException("You need to set a base_url on Guzzle client.");
-        }
+        $this->name = $name;
     }
 
-    public function select(SolrSelect $select)
+    public function select(Select $select)
     {
-        $url = "select?" . $select->render();
+        $query = $select->render();
+        $url = "$this->name/select?$query";
 
         $response = $this->guzzle->get($url);
+
         return (string) $response->getBody(true);
     }
 
-    public function update(SolrUpdate $update)
+    public function update(Update $update)
     {
-        $url = "update/json?" . $update->render();
+        $query = $update->render();
+        $url = "$this->name/update?$query";
 
         $response = $this->guzzle->post($url, [
             'body' => $update->getBody()
         ]);
+
         return (string) $response->getBody(true);
     }
 }

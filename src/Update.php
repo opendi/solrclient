@@ -16,15 +16,38 @@
  */
 namespace Opendi\Solr\Client;
 
-// TODO rest of supported fields
-class SolrExtendedDismaxParser implements SolrParser
+class Update extends Expression
 {
-    private $type = 'edismax';
+    private $commit = false;
+    private $body;
+
+    public function commit()
+    {
+        $this->commit = true;
+
+        return $this;
+    }
+
+    public function body($body)
+    {
+        $this->body = $body;
+
+        return $this;
+    }
+
+    public function getBody()
+    {
+        return $this->body;
+    }
 
     public function render()
     {
-        $result = 'defType=' . $this->type;
+        $query = '';
 
-        return $result;
+        if ($this->commit) {
+            $query .= 'commit=true';
+        }
+
+        return $query;
     }
 }

@@ -16,6 +16,8 @@
  */
 namespace Opendi\Solr\Client;
 
+use Opendi\Solr\Client\Parsers\ParserInterface;
+
 /**
  * http://stackoverflow.com/questions/8089947/solr-and-query-over-multiple-fields
  * https://wiki.apache.org/solr/MoreLikeThis
@@ -23,13 +25,11 @@ namespace Opendi\Solr\Client;
  *
  * TODO http://localhost:8983/solr/entries/select?q=categories%3AFriseur*&wt=json&indent=true&fq={!geofilt%20pt=48.166535,11.5178152%20sfield=location%20d=5}&sfield=location&pt=48.166535,11.5178152&sort=geodist()%20asc
  *
- * Class SolrSelect
+ * Class Select
  * @package opendi\solrclient
  */
-class SolrSelect extends SolrExpression
+class Select extends Expression
 {
-    use InstanceTrait;
-
     const FORMAT_JSON = 'json';
     const FORMAT_XML = 'xml';
     const FORMAT_RUBY = 'ruby';
@@ -44,7 +44,7 @@ class SolrSelect extends SolrExpression
 
     private $queryFields = [];
 
-    /** @var SolrFacet */
+    /** @var Facet */
     private $facet = null;
 
     private $indent = false;
@@ -57,17 +57,17 @@ class SolrSelect extends SolrExpression
 
     private $raw = null;
 
-    /** @var SolrParser */
+    /** @var ParserInterface */
     private $parser = null;
 
-    public function andExpression(SolrExpression $expression)
+    public function andExpression(Expression $expression)
     {
         $this->andExpressions[] = $expression;
 
         return $this;
     }
 
-    public function orExpression(SolrExpression $expression)
+    public function orExpression(Expression $expression)
     {
         $this->orExpressions[] = $expression;
 
@@ -109,14 +109,14 @@ class SolrSelect extends SolrExpression
         return $this;
     }
 
-    public function filter(SolrFilter $filter)
+    public function filter(Filter $filter)
     {
         $this->filters[] = $filter;
 
         return $this;
     }
 
-    public function facet(SolrFacet $facet)
+    public function facet(Facet $facet)
     {
         $this->facet = $facet;
 
@@ -147,10 +147,10 @@ class SolrSelect extends SolrExpression
     /**
      * Use an alternate parser to the lucene one, like dismax
      *
-     * @param SolrParser $parser
+     * @param ParserInterface $parser
      * @return $this
      */
-    public function parser(SolrParser $parser)
+    public function parser(ParserInterface $parser)
     {
         $this->parser = $parser;
 
@@ -164,7 +164,7 @@ class SolrSelect extends SolrExpression
         $query .= parent::render();
 
         if (sizeOf($this->andExpressions)) {
-            /** @var SolrExpression $expression */
+            /** @var Expression $expression */
             foreach ($this->andExpressions as $expression) {
                 if ($query != 'q=') {
                     $query .= '%20AND%20';
@@ -174,7 +174,7 @@ class SolrSelect extends SolrExpression
         }
 
         if (sizeOf($this->orExpressions)) {
-            /** @var SolrExpression $expression */
+            /** @var Expression $expression */
             foreach ($this->orExpressions as $expression) {
                 if ($query != 'q=') {
                     $query .= '%20OR%20';

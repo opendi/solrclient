@@ -16,29 +16,30 @@
  */
 namespace Opendi\Solr\Client\Tests;
 
-use Opendi\Solr\Client\SolrDismaxParser;
-use Opendi\Solr\Client\SolrExtendedDismaxParser;
-use Opendi\Solr\Client\SolrFacet;
-use Opendi\Solr\Client\SolrFilter;
-use Opendi\Solr\Client\SolrSelect;
+use Opendi\Solr\Client\Parsers\DismaxParser;
+use Opendi\Solr\Client\Parsers\ExtendedDismaxParser;
+use Opendi\Solr\Client\Facet;
+use Opendi\Solr\Client\Filter;
+use Opendi\Solr\Client\Select;
+use Opendi\Solr\Client\Solr;
 
-class SolrSelectTest extends \PHPUnit_Framework_TestCase
+class SelectTest extends \PHPUnit_Framework_TestCase
 {
     public function testBasicSearch()
     {
-        $select = new SolrSelect();
+        $select = new Select();
         $select->search('opendi', 'name');
         $this->assertEquals('q=name:opendi', $select->render());
 
-        $select = new SolrSelect();
+        $select = new Select();
         $select->search('(opendi OR test)', 'name');
         $this->assertEquals('q=name:(opendi OR test)', $select->render());
 
-        $select = new SolrSelect();
+        $select = new Select();
         $select->search('opendi', 'name')->andSearch('services', 'categories');
         $this->assertEquals('q=name:opendi%20AND%20categories:services', $select->render());
 
-        $select = new SolrSelect();
+        $select = new Select();
         $select
             ->search('opendi', 'name')
             ->andSearch('services', 'categories')
@@ -48,61 +49,61 @@ class SolrSelectTest extends \PHPUnit_Framework_TestCase
 
     public function testQueryFieldSearch()
     {
-        $select = new SolrSelect();
+        $select = new Select();
         $select->search('opendi')->queryField('name');
         $this->assertEquals('q=opendi&qf=name', $select->render());
     }
 
     public function testIndent()
     {
-        $select = new SolrSelect();
+        $select = new Select();
         $select->indent()->search('opendi', 'name');
         $this->assertEquals('q=name:opendi&indent=true', $select->render());
     }
 
     public function testRows()
     {
-        $select = new SolrSelect();
+        $select = new Select();
         $select->indent()->rows(20)->search('opendi', 'name');
         $this->assertEquals('q=name:opendi&indent=true&rows=20', $select->render());
 
-        $select = new SolrSelect();
+        $select = new Select();
         $select->indent()->rows(0)->search('opendi', 'name');
         $this->assertEquals('q=name:opendi&indent=true&rows=0', $select->render());
 
-        $select = new SolrSelect();
+        $select = new Select();
         $select->indent()->search('opendi', 'name');
         $this->assertEquals('q=name:opendi&indent=true', $select->render());
     }
 
     public function testStart()
     {
-        $select = new SolrSelect();
+        $select = new Select();
         $select->indent()->rows(20)->start(10)->search('opendi', 'name');
         $this->assertEquals('q=name:opendi&indent=true&rows=20&start=10', $select->render());
     }
 
     public function testFormat()
     {
-        $select = new SolrSelect();
-        $select->indent()->format(SolrSelect::FORMAT_JSON)->search('opendi', 'name');
+        $select = new Select();
+        $select->indent()->format(Select::FORMAT_JSON)->search('opendi', 'name');
         $this->assertEquals('q=name:opendi&wt=json&indent=true', $select->render());
-        $select->format(SolrSelect::FORMAT_CSV);
+        $select->format(Select::FORMAT_CSV);
         $this->assertEquals('q=name:opendi&wt=csv&indent=true', $select->render());
-        $select->format(SolrSelect::FORMAT_PHP);
+        $select->format(Select::FORMAT_PHP);
         $this->assertEquals('q=name:opendi&wt=php&indent=true', $select->render());
-        $select->format(SolrSelect::FORMAT_RUBY);
+        $select->format(Select::FORMAT_RUBY);
         $this->assertEquals('q=name:opendi&wt=ruby&indent=true', $select->render());
-        $select->format(SolrSelect::FORMAT_XML);
+        $select->format(Select::FORMAT_XML);
         $this->assertEquals('q=name:opendi&wt=xml&indent=true', $select->render());
     }
 
     public function testWithFilters()
     {
-        $filter = new SolrFilter();
+        $filter = new Filter();
         $filter->filterFor('x','y',false);
 
-        $select = new SolrSelect();
+        $select = new Select();
         $select
             ->search('opendi', 'name')
             ->filter($filter);
@@ -112,12 +113,12 @@ class SolrSelectTest extends \PHPUnit_Framework_TestCase
 
     public function testWithMultipleFilters()
     {
-        $filter = new SolrFilter();
+        $filter = new Filter();
         $filter
             ->filterFor('x', 'y', false)
             ->filterFor('c', 'a');
 
-        $select = new SolrSelect();
+        $select = new Select();
         $select
             ->search('opendi', 'name')
             ->format('json')
@@ -128,10 +129,10 @@ class SolrSelectTest extends \PHPUnit_Framework_TestCase
 
     public function testWithFacets()
     {
-        $facet = new SolrFacet();
+        $facet = new Facet();
         $facet->field('category')->limit(1)->minCount(1);
 
-        $select = new SolrSelect();
+        $select = new Select();
         $select
             ->search('opendi', 'name')
             ->facet($facet);
@@ -141,24 +142,34 @@ class SolrSelectTest extends \PHPUnit_Framework_TestCase
 
     public function testDebug()
     {
-        $select = new SolrSelect();
+        $select = new Select();
         $select->search('opendi', 'name')->debug();
         $this->assertEquals('q=name:opendi&debug=true', $select->render());
     }
 
     public function testDismax()
     {
-        $parser = new SolrDismaxParser();
-        $select = new SolrSelect();
+        $parser = new DismaxParser();
+        $select = new Select();
         $select->search('opendi', 'name')->parser($parser)->debug();
         $this->assertEquals('q=name:opendi&defType=dismax&debug=true', $select->render());
     }
 
     public function testExtendedDismax()
     {
-        $parser = new SolrExtendedDismaxParser();
-        $select = new SolrSelect();
+        $parser = new ExtendedDismaxParser();
+        $select = new Select();
         $select->search('opendi', 'name')->parser($parser)->debug();
         $this->assertEquals('q=name:opendi&defType=edismax&debug=true', $select->render());
+    }
+
+    public function testFactory()
+    {
+        $select1 = Solr::select();
+        $select2 = Solr::select();
+
+        $this->assertNotSame($select1, $select2);
+        $this->assertInstanceOf(Select::class, $select1);
+        $this->assertInstanceOf(Select::class, $select2);
     }
 }

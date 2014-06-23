@@ -14,17 +14,20 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client;
+namespace Opendi\Solr\Client\Tests;
 
-// TODO rest of supported fields
-class SolrDismaxParser implements SolrParser
+use Opendi\Solr\Client\Update;
+use Opendi\Solr\Client\Solr;
+
+class UpdateTest extends \PHPUnit_Framework_TestCase
 {
-    private $type = 'dismax';
-
-    public function render()
+    public function testFactory()
     {
-        $result = 'defType=' . $this->type;
+        $update1 = Solr::update();
+        $update2 = Solr::update();
 
-        return $result;
+        $this->assertNotSame($update1, $update2);
+        $this->assertInstanceOf(Update::class, $update1);
+        $this->assertInstanceOf(Update::class, $update2);
     }
 }

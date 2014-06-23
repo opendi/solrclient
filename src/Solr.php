@@ -16,7 +16,38 @@
  */
 namespace Opendi\Solr\Client;
 
-interface SolrParser
+use GuzzleHttp\Client as Guzzle;
+
+/**
+ * Helper factory class for instantiating new Solr components.
+ *
+ * Allows easy command chaining and a readable interface.
+ *
+ * Examples:
+ * ```
+ * $select = Solr::select()->field('name')->rows(10);
+ * $facet = Solr::facet()->pivot('foo', 'bar')->prefix('x');
+ * ```
+ */
+class Solr
 {
-    public function render();
+    public static function facet()
+    {
+        return new Facet();
+    }
+
+    public static function filter()
+    {
+        return new Filter();
+    }
+
+    public static function select()
+    {
+        return new Select();
+    }
+
+    public static function update()
+    {
+        return new Update();
+    }
 }

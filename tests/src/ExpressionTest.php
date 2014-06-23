@@ -16,60 +16,60 @@
  */
 namespace Opendi\Solr\Client\Tests;
 
-use Opendi\Solr\Client\SolrExpression;
-use Opendi\Solr\Client\SolrSelect;
+use Opendi\Solr\Client\Expression;
+use Opendi\Solr\Client\Select;
 
-class SolrExpressionTest extends \PHPUnit_Framework_TestCase
+class ExpressionTest extends \PHPUnit_Framework_TestCase
 {
     public function testBasicSearch()
     {
-        $select = new SolrExpression();
+        $select = new Expression();
         $select->search('opendi', 'name');
         $this->assertEquals('name:opendi', $select->render());
 
-        $select = new SolrExpression();
+        $select = new Expression();
         $select->search('(opendi OR test)', 'name');
         $this->assertEquals('name:(opendi OR test)', $select->render());
 
-        $select = new SolrExpression();
+        $select = new Expression();
         $select->search('opendi', 'name')->andSearch('services', 'categories');
         $this->assertEquals('name:opendi%20AND%20categories:services', $select->render());
 
-        $select = new SolrSelect();
+        $select = new Select();
         $select
             ->search('opendi', 'name')
             ->andSearch('services', 'categories')
             ->orSearch('localsearch', 'categories');
 
-        $expression = new SolrExpression();
+        $expression = new Expression();
         $expression->search('hello', 'world');
         $select->andExpression($expression);
 
         $this->assertEquals('q=name:opendi%20AND%20categories:services%20OR%20categories:localsearch%20AND%20(world:hello)', $select->render());
 
-        $select = new SolrSelect();
+        $select = new Select();
         $select
             ->search('opendi', 'name')
             ->andSearch('services', 'categories')
             ->orSearch('localsearch', 'categories');
 
-        $expression = new SolrExpression();
+        $expression = new Expression();
         $expression->search('hello', 'world')->andSearch('aaa', 'xxx');
         $select->andExpression($expression);
 
         $this->assertEquals('q=name:opendi%20AND%20categories:services%20OR%20categories:localsearch%20AND%20(world:hello%20AND%20xxx:aaa)', $select->render());
 
-        $select = new SolrSelect();
+        $select = new Select();
         $select
             ->search('opendi', 'name')
             ->andSearch('services', 'categories')
             ->orSearch('localsearch', 'categories');
 
-        $expression = new SolrExpression();
+        $expression = new Expression();
         $expression->search('hello', 'world')->andSearch('aaa', 'xxx');
         $select->andExpression($expression);
 
-        $expression = new SolrExpression();
+        $expression = new Expression();
         $expression->search('123', '321');
         $select->orExpression($expression);
 
