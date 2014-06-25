@@ -24,7 +24,7 @@ use GuzzleHttp\Client as Guzzle;
 class Core
 {
     /**
-     * @var GuzzleHttp\Client
+     * @var \GuzzleHttp\Client
      */
     private $guzzle;
 
