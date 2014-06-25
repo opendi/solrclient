@@ -55,7 +55,8 @@ class Core
         $url = "$this->name/update?$query";
 
         $response = $this->guzzle->post($url, [
-            'body' => $update->getBody()
+            'body' => $update->getBody(),
+            'headers' => ['Content-Type' => 'application/json']
         ]);
 
         return (string) $response->getBody(true);
