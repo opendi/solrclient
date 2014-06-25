@@ -24,7 +24,7 @@ use GuzzleHttp\Client as Guzzle;
 class Core
 {
     /**
-     * @var GuzzleHttp\Client
+     * @var \GuzzleHttp\Client
      */
     private $guzzle;
 
@@ -55,7 +55,8 @@ class Core
         $url = "$this->name/update?$query";
 
         $response = $this->guzzle->post($url, [
-            'body' => $update->getBody()
+            'body' => $update->getBody(),
+            'headers' => ['Content-Type' => 'application/json']
         ]);
 
         return (string) $response->getBody(true);
