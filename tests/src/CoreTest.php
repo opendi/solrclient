@@ -76,7 +76,7 @@ class CoreTest extends \PHPUnit_Framework_TestCase
             ->andReturn($baseUrl);
 
         $guzzle->shouldReceive('post')
-            ->with("entries/update?", ['body' => $body])
+            ->with("entries/update?", ['body' => $body, 'headers'=> ['Content-Type' => 'application/json']])
             ->once()
             ->andReturn($request);
 
