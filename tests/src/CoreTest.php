@@ -46,7 +46,7 @@ class CoreTest extends \PHPUnit_Framework_TestCase
             ->andReturn($baseUrl);
 
         $guzzle->shouldReceive('get')
-            ->with("entries/select?q=name:frank zappa")
+            ->with("entries/select?q=" . urlencode("name:frank zappa"))
             ->once()
             ->andReturn($request);
 

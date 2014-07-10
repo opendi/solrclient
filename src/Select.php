@@ -159,32 +159,32 @@ class Select extends Expression
 
     public function render()
     {
-        $query = 'q=';
+        $query = parent::render();
 
-        $query .= parent::render();
-
-        if (sizeOf($this->andExpressions)) {
+        if (!empty($this->andExpressions)) {
             /** @var Expression $expression */
             foreach ($this->andExpressions as $expression) {
-                if ($query != 'q=') {
-                    $query .= '%20AND%20';
+                if (!empty($query)) {
+                    $query .= ' AND ';
                 }
                 $query .= '(' . $expression->render() . ')';
             }
         }
 
-        if (sizeOf($this->orExpressions)) {
+        if (!empty($this->orExpressions)) {
             /** @var Expression $expression */
             foreach ($this->orExpressions as $expression) {
-                if ($query != 'q=') {
-                    $query .= '%20OR%20';
+                if (!empty($query)) {
+                    $query .= ' OR ';
                 }
                 $query .= '(' . $expression->render() . ')';
             }
         }
 
-        if (sizeOf($this->queryFields) > 0) {
-            $query .= '&qf=' . implode('%20', $this->queryFields);
+        $query = "q=" . urlencode($query);
+
+        if (!empty($this->queryFields)) {
+            $query .= '&qf=' . implode('+', $this->queryFields);
         }
 
         if ($this->parser != null) {

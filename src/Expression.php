@@ -43,6 +43,10 @@ class Expression
     private function processTerm($term, $in)
     {
         if (isset($in)) {
+            // For empty terms produce field:""
+            if (empty($term)) {
+                $term = '""';
+            }
             return  $in . ':' . $term;
         }
 
@@ -51,12 +55,12 @@ class Expression
 
     public function render()
     {
-        $result = implode('%20AND%20', $this->queryAnd);
+        $result = implode(' AND ', $this->queryAnd);
 
         if (sizeOf($this->queryAnd) > 0 && sizeOf($this->queryOr) > 0) {
-            $result .= '%20OR%20';
+            $result .= ' OR ';
         }
-        $result .= implode('%20OR%20', $this->queryOr);
+        $result .= implode(' OR ', $this->queryOr);
 
         return $result;
     }
