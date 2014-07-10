@@ -23,33 +23,30 @@ class Expression
 
     public function search($term, $in = null)
     {
-        $value = '';
-        if ($in != null) {
-            $value .=  $in . ':' . $term;
-        } else {
-            $value = $term;
-        }
-        $this->queryAnd[] = $value;
-
-        return $this;
+        return $this->andSearch($term, $in);
     }
 
     public function andSearch($term, $in = null)
     {
-        return $this->search($term, $in);
+        $this->queryAnd[] = $this->processTerm($term, $in);;
+
+        return $this;
     }
 
     public function orSearch($term, $in = null)
     {
-        $value = '';
-        if ($in != null) {
-            $value .=  $in . ':' . $term;
-        } else {
-            $value = $term;
-        }
-        $this->queryOr[] = $value;
+        $this->queryOr[] = $this->processTerm($term, $in);
 
         return $this;
+    }
+
+    private function processTerm($term, $in)
+    {
+        if (isset($in)) {
+            return  $in . ':' . $term;
+        }
+
+        return $term;
     }
 
     public function render()
