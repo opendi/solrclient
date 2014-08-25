@@ -1,6 +1,21 @@
 Opendi Solr Client Changelog
 ============================
 
+0.3.2 (2014-08-25)
+------------------
+
+#### Features
+
+* Added a [Pimple service provider](https://github.com/fabpot/Pimple#extending-a-container)
+  for the Solr client
+
+0.3.1 (2014-07-25)
+------------------
+
+#### Bugfixes
+
+* Fixed solr update which didn't work by adding headers for JSON content type
+
 0.3.0 (2014-06-23)
 ------------------
 
