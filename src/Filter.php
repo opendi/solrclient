@@ -20,14 +20,34 @@ class Filter
 {
     private $filters = [];
 
-    public function filterFor($term, $in, $cache = true)
+    /**
+     * TODO:
+     * Refactor.
+     *
+     * This is a valid filter:
+     *
+     * select?q=*:*&fq={!geofilt}&sort=geodist()+asc
+     *
+     * It should be possible to add filters like {!cache=false} with just using constants.
+     *
+     * Also, filter queries support multiple parameters.
+     *
+     * They should be supported raw, but also have some support for creating complex filter queries.
+     *
+     * More info: http://wiki.apache.org/solr/CommonQueryParameters#fq
+     */
+    public function filterFor($term, $in = null, $cache = true)
     {
         $param = '';
         if (!$cache) {
             $param = '{!cache=false}';
         }
 
-        $this->filters[] = $param.$in . ':' . $term;
+        if ($in == null) {
+            $this->filters[] = $param.$term;
+        } else {
+            $this->filters[] = $param.$in . ':' . $term;
+        }
 
         return $this;
     }

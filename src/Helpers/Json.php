@@ -31,7 +31,7 @@ class Json
         $return = call_user_func_array('json_encode', func_get_args());
 
         if ($return === false) {
-            $error = getLastError();
+            $error = $this->getLastError();
             throw new SolrException($error);
         }
 
@@ -43,7 +43,7 @@ class Json
         $return = call_user_func_array('json_decode', func_get_args());
 
         if ($return === false) {
-            $error = getLastError();
+            $error = $this->getLastError();
             throw new SolrException($error);
         }
 

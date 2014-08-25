@@ -23,43 +23,44 @@ class Expression
 
     public function search($term, $in = null)
     {
-        $value = '';
-        if ($in != null) {
-            $value .=  $in . ':' . $term;
-        } else {
-            $value = $term;
-        }
-        $this->queryAnd[] = $value;
-
-        return $this;
+        return $this->andSearch($term, $in);
     }
 
     public function andSearch($term, $in = null)
     {
-        return $this->search($term, $in);
-    }
-
-    public function orSearch($term, $in = null)
-    {
-        $value = '';
-        if ($in != null) {
-            $value .=  $in . ':' . $term;
-        } else {
-            $value = $term;
-        }
-        $this->queryOr[] = $value;
+        $this->queryAnd[] = $this->processTerm($term, $in);;
 
         return $this;
     }
 
+    public function orSearch($term, $in = null)
+    {
+        $this->queryOr[] = $this->processTerm($term, $in);
+
+        return $this;
+    }
+
+    private function processTerm($term, $in)
+    {
+        if (isset($in)) {
+            // For empty terms produce field:""
+            if (empty($term)) {
+                $term = '""';
+            }
+            return  $in . ':' . $term;
+        }
+
+        return $term;
+    }
+
     public function render()
     {
-        $result = implode('%20AND%20', $this->queryAnd);
+        $result = implode(' AND ', $this->queryAnd);
 
         if (sizeOf($this->queryAnd) > 0 && sizeOf($this->queryOr) > 0) {
-            $result .= '%20OR%20';
+            $result .= ' OR ';
         }
-        $result .= implode('%20OR%20', $this->queryOr);
+        $result .= implode(' OR ', $this->queryOr);
 
         return $result;
     }

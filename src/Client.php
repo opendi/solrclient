@@ -122,4 +122,14 @@ class Client
     {
         return $this->guzzle->getEmitter();
     }
+
+    /**
+     * Returns the underlying Guzzle client.
+     *
+     * @return GuzzleHttp\Client
+     */
+    public function getGuzzleClient()
+    {
+        return $this->guzzle;
+    }
 }

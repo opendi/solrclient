@@ -33,7 +33,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
 
         $select = new Expression();
         $select->search('opendi', 'name')->andSearch('services', 'categories');
-        $this->assertEquals('name:opendi%20AND%20categories:services', $select->render());
+        $this->assertEquals('name:opendi AND categories:services', $select->render());
 
         $select = new Select();
         $select
@@ -45,7 +45,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         $expression->search('hello', 'world');
         $select->andExpression($expression);
 
-        $this->assertEquals('q=name:opendi%20AND%20categories:services%20OR%20categories:localsearch%20AND%20(world:hello)', $select->render());
+        $this->assertEquals('q=' . urlencode('name:opendi AND categories:services OR categories:localsearch AND (world:hello)'), $select->render());
 
         $select = new Select();
         $select
@@ -57,7 +57,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         $expression->search('hello', 'world')->andSearch('aaa', 'xxx');
         $select->andExpression($expression);
 
-        $this->assertEquals('q=name:opendi%20AND%20categories:services%20OR%20categories:localsearch%20AND%20(world:hello%20AND%20xxx:aaa)', $select->render());
+        $this->assertEquals('q=' . urlencode('name:opendi AND categories:services OR categories:localsearch AND (world:hello AND xxx:aaa)'), $select->render());
 
         $select = new Select();
         $select
@@ -73,6 +73,13 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         $expression->search('123', '321');
         $select->orExpression($expression);
 
-        $this->assertEquals('q=name:opendi%20AND%20categories:services%20OR%20categories:localsearch%20AND%20(world:hello%20AND%20xxx:aaa)%20OR%20(321:123)', $select->render());
+        $this->assertEquals('q=' . urlencode('name:opendi AND categories:services OR categories:localsearch AND (world:hello AND xxx:aaa) OR (321:123)'), $select->render());
+    }
+
+    public function testSearchEmptyTerm()
+    {
+        $expression = new Expression();
+        $expression->search("", "name");
+        $this->assertEquals('name:""', $expression->render());
     }
 }

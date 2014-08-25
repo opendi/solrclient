@@ -29,22 +29,22 @@ class SelectTest extends \PHPUnit_Framework_TestCase
     {
         $select = new Select();
         $select->search('opendi', 'name');
-        $this->assertEquals('q=name:opendi', $select->render());
+        $this->assertEquals('q=name%3Aopendi', $select->render());
 
         $select = new Select();
         $select->search('(opendi OR test)', 'name');
-        $this->assertEquals('q=name:(opendi OR test)', $select->render());
+        $this->assertEquals('q=' . urlencode('name:(opendi OR test)'), $select->render());
 
         $select = new Select();
         $select->search('opendi', 'name')->andSearch('services', 'categories');
-        $this->assertEquals('q=name:opendi%20AND%20categories:services', $select->render());
+        $this->assertEquals('q=' . urlencode('name:opendi AND categories:services'), $select->render());
 
         $select = new Select();
         $select
             ->search('opendi', 'name')
             ->andSearch('services', 'categories')
             ->orSearch('localsearch', 'categories');
-        $this->assertEquals('q=name:opendi%20AND%20categories:services%20OR%20categories:localsearch', $select->render());
+        $this->assertEquals('q=' . urlencode('name:opendi AND categories:services OR categories:localsearch'), $select->render());
     }
 
     public function testQueryFieldSearch()
@@ -58,44 +58,44 @@ class SelectTest extends \PHPUnit_Framework_TestCase
     {
         $select = new Select();
         $select->indent()->search('opendi', 'name');
-        $this->assertEquals('q=name:opendi&indent=true', $select->render());
+        $this->assertEquals('q=name%3Aopendi&indent=true', $select->render());
     }
 
     public function testRows()
     {
         $select = new Select();
         $select->indent()->rows(20)->search('opendi', 'name');
-        $this->assertEquals('q=name:opendi&indent=true&rows=20', $select->render());
+        $this->assertEquals('q=name%3Aopendi&indent=true&rows=20', $select->render());
 
         $select = new Select();
         $select->indent()->rows(0)->search('opendi', 'name');
-        $this->assertEquals('q=name:opendi&indent=true&rows=0', $select->render());
+        $this->assertEquals('q=name%3Aopendi&indent=true&rows=0', $select->render());
 
         $select = new Select();
         $select->indent()->search('opendi', 'name');
-        $this->assertEquals('q=name:opendi&indent=true', $select->render());
+        $this->assertEquals('q=name%3Aopendi&indent=true', $select->render());
     }
 
     public function testStart()
     {
         $select = new Select();
         $select->indent()->rows(20)->start(10)->search('opendi', 'name');
-        $this->assertEquals('q=name:opendi&indent=true&rows=20&start=10', $select->render());
+        $this->assertEquals('q=name%3Aopendi&indent=true&rows=20&start=10', $select->render());
     }
 
     public function testFormat()
     {
         $select = new Select();
         $select->indent()->format(Select::FORMAT_JSON)->search('opendi', 'name');
-        $this->assertEquals('q=name:opendi&wt=json&indent=true', $select->render());
+        $this->assertEquals('q=name%3Aopendi&wt=json&indent=true', $select->render());
         $select->format(Select::FORMAT_CSV);
-        $this->assertEquals('q=name:opendi&wt=csv&indent=true', $select->render());
+        $this->assertEquals('q=name%3Aopendi&wt=csv&indent=true', $select->render());
         $select->format(Select::FORMAT_PHP);
-        $this->assertEquals('q=name:opendi&wt=php&indent=true', $select->render());
+        $this->assertEquals('q=name%3Aopendi&wt=php&indent=true', $select->render());
         $select->format(Select::FORMAT_RUBY);
-        $this->assertEquals('q=name:opendi&wt=ruby&indent=true', $select->render());
+        $this->assertEquals('q=name%3Aopendi&wt=ruby&indent=true', $select->render());
         $select->format(Select::FORMAT_XML);
-        $this->assertEquals('q=name:opendi&wt=xml&indent=true', $select->render());
+        $this->assertEquals('q=name%3Aopendi&wt=xml&indent=true', $select->render());
     }
 
     public function testWithFilters()
@@ -108,7 +108,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase
             ->search('opendi', 'name')
             ->filter($filter);
 
-        $this->assertEquals('q=name:opendi&fq={!cache=false}y:x', $select->render());
+        $this->assertEquals('q=name%3Aopendi&fq={!cache=false}y:x', $select->render());
     }
 
     public function testWithMultipleFilters()
@@ -124,7 +124,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase
             ->format('json')
             ->filter($filter);
 
-        $this->assertEquals('q=name:opendi&wt=json&fq={!cache=false}y:x&fq=a:c', $select->render());
+        $this->assertEquals('q=name%3Aopendi&wt=json&fq={!cache=false}y:x&fq=a:c', $select->render());
     }
 
     public function testWithFacets()
@@ -137,14 +137,14 @@ class SelectTest extends \PHPUnit_Framework_TestCase
             ->search('opendi', 'name')
             ->facet($facet);
 
-        $this->assertEquals('q=name:opendi&facet=true&facet.field=category&facet.limit=1&facet.mincount=1', $select->render());
+        $this->assertEquals('q=name%3Aopendi&facet=true&facet.field=category&facet.limit=1&facet.mincount=1', $select->render());
     }
 
     public function testDebug()
     {
         $select = new Select();
         $select->search('opendi', 'name')->debug();
-        $this->assertEquals('q=name:opendi&debug=true', $select->render());
+        $this->assertEquals('q=name%3Aopendi&debug=true', $select->render());
     }
 
     public function testDismax()
@@ -152,7 +152,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase
         $parser = new DismaxParser();
         $select = new Select();
         $select->search('opendi', 'name')->parser($parser)->debug();
-        $this->assertEquals('q=name:opendi&defType=dismax&debug=true', $select->render());
+        $this->assertEquals('q=name%3Aopendi&defType=dismax&debug=true', $select->render());
     }
 
     public function testExtendedDismax()
@@ -160,7 +160,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase
         $parser = new ExtendedDismaxParser();
         $select = new Select();
         $select->search('opendi', 'name')->parser($parser)->debug();
-        $this->assertEquals('q=name:opendi&defType=edismax&debug=true', $select->render());
+        $this->assertEquals('q=name%3Aopendi&defType=edismax&debug=true', $select->render());
     }
 
     public function testFactory()
