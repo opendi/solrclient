@@ -152,4 +152,91 @@ class CoreTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($result, $count);
     }
+
+    public function testDelete()
+    {
+        $baseUrl = "http://localhost:8983/solr/";
+        $retval = 123;
+        $core = "xxx";
+
+        // Mock request and response
+        $response = m::mock('GuzzleHttp\\Message\\Response');
+        $response->shouldReceive('json')
+            ->once()
+            ->andReturn($retval);
+
+        // Mock Guzzle client
+        $guzzle = m::mock('GuzzleHttp\\Client');
+        $guzzle->shouldReceive('getBaseUrl')
+            ->once()
+            ->andReturn($baseUrl);
+
+        $path = "$core/update";
+        $options = [
+            'query' => [
+                'commit' => 'true',
+                'wt' => 'json',
+            ],
+            'headers' => [
+                'Content-Type' => 'application/json'
+            ],
+            'body' => '{"delete":{"query":"*:*"}}'
+        ];
+
+        $guzzle->shouldReceive('post')
+            ->with($path, $options)
+            ->once()
+            ->andReturn($response);
+
+        $client = new Client($guzzle);
+
+        $actual = $client->core($core)->delete();
+
+        $this->assertSame($retval, $actual);
+    }
+
+    public function testDelete2()
+    {
+        $baseUrl = "http://localhost:8983/solr/";
+        $retval = 123;
+        $core = "xxx";
+
+        $select = "name:ivan";
+        $commit = false;
+
+        // Mock request and response
+        $response = m::mock('GuzzleHttp\\Message\\Response');
+        $response->shouldReceive('json')
+            ->once()
+            ->andReturn($retval);
+
+        // Mock Guzzle client
+        $guzzle = m::mock('GuzzleHttp\\Client');
+        $guzzle->shouldReceive('getBaseUrl')
+            ->once()
+            ->andReturn($baseUrl);
+
+        $path = "$core/update";
+        $options = [
+            'query' => [
+                'commit' => 'false',
+                'wt' => 'json',
+            ],
+            'headers' => [
+                'Content-Type' => 'application/json'
+            ],
+            'body' => '{"delete":{"query":"' . $select . '"}}'
+        ];
+
+        $guzzle->shouldReceive('post')
+            ->with($path, $options)
+            ->once()
+            ->andReturn($response);
+
+        $client = new Client($guzzle);
+
+        $actual = $client->core($core)->delete("name:ivan", false);
+
+        $this->assertSame($retval, $actual);
+    }
 }

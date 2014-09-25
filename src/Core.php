@@ -19,6 +19,8 @@ namespace Opendi\Solr\Client;
 use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\Exception\RequestException;
 
+use Opendi\Lang\Json;
+
 /**
  * Functionality which can be invoked on a Solr core.
  */
@@ -96,6 +98,28 @@ class Core
         return $status['index']['numDocs'];
     }
 
+    /**
+     * Deletes records from the core.
+     */
+    public function delete($select = "*:*", $commit = true)
+    {
+        $core = $this->name;
+
+        $path = "$core/update";
+
+        $query = [
+            'commit' => $commit ? "true" : "false"
+        ];
+
+        $bodyData = Json::encode([
+            "delete" => [
+                "query" => $select
+            ]
+        ]);
+
+        return $this->post($path, $query, $bodyData);
+    }
+
     /** Performs a GET request. */
     private function get($path, $query = [])
     {
@@ -112,6 +136,34 @@ class Core
         }
 
         // Decode and return data
+        return $response->json();
+    }
+
+    /** Performs a POST request. */
+    private function post($path, array $query = [], $body = null, array $headers = [])
+    {
+        // Set writer type to JSON
+        $query['wt'] = 'json';
+
+        // Set JSON content type
+        $headers['Content-Type'] = 'application/json';
+
+        $options = [
+            'query' => $query,
+            'headers' => $headers,
+        ];
+
+        if (isset($body)) {
+            $options['body'] = $body;
+        }
+
+        // Exectue the POST request
+        try {
+            $response = $this->guzzle->post($path, $options);
+        } catch (RequestException $ex) {
+            $this->handleRequestException($ex);
+        }
+
         return $response->json();
     }
 
