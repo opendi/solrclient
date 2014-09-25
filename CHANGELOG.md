@@ -1,6 +1,12 @@
 Opendi Solr Client Changelog
 ============================
 
+0.3.3 (TBA)
+-----------
+
+* Added `Core::count()`
+* Added `Core::status()`
+
 0.3.2 (2014-08-25)
 ------------------
 

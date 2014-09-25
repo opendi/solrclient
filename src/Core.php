@@ -17,6 +17,7 @@
 namespace Opendi\Solr\Client;
 
 use GuzzleHttp\Client as Guzzle;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * Functionality which can be invoked on a Solr core.
@@ -60,5 +61,74 @@ class Core
         ]);
 
         return (string) $response->getBody(true);
+    }
+
+    /**
+     * Returns core status info.
+     *
+     * @return object
+     */
+    public function status()
+    {
+        $core = $this->name;
+
+        $data = $this->get("admin/cores", [
+            "action" => "STATUS",
+            "core" => $core,
+        ]);
+
+        if (empty($data['status'][$core])) {
+            throw new \Exception("Core \"$core\" does not exist.");
+        }
+
+        return $data['status'][$core];
+    }
+
+    /**
+     * Returns the number of records in the core.
+     *
+     * @return integer
+     */
+    public function count()
+    {
+        $status = $this->status();
+
+        return $status['index']['numDocs'];
+    }
+
+    /** Performs a GET request. */
+    private function get($path, $query = [])
+    {
+        // Set writer type to JSON
+        $query['wt'] = 'json';
+
+        // Exectue the GET request
+        try {
+            $response = $this->guzzle->get($path, [
+                'query' => $query
+            ]);
+        } catch (RequestException $ex) {
+            $this->handleRequestException($ex);
+        }
+
+        // Decode and return data
+        return $response->json();
+    }
+
+    private function handleRequestException(RequestException $ex)
+    {
+        if ($ex->hasResponse()) {
+            $response = $ex->getResponse();
+
+            $reason = $response->getReasonPhrase();
+            $code = $response->getStatusCode();
+            $data = $response->json();
+
+            $msg = $data['error']['msg'];
+
+            throw new \Exception("Solr error HTTP $code $reason:  $msg", 0, $ex);
+        }
+
+        throw new \Exception("Solr query failed", 0, $ex);
     }
 }

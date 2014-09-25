@@ -86,4 +86,70 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $client = new Client($guzzle);
         $client->core('entries')->update($update);
     }
+
+    private function setupStatus($core, $status)
+    {
+        $baseUrl = "http://localhost:8983/solr/";
+
+        // Mock request and response objects
+        $request = m::mock('GuzzleHttp\\Message\\Request');
+        $request->shouldReceive('json')
+            ->once()
+            ->andReturn([
+                'status' => [
+                    $core => $status
+                ]
+            ]);
+
+        // Mock Guzzle client
+        $guzzle = m::mock('GuzzleHttp\\Client');
+        $guzzle->shouldReceive('getBaseUrl')
+            ->once()
+            ->andReturn($baseUrl);
+
+        $guzzle->shouldReceive('get')
+            ->with("admin/cores", [
+                'query' => [
+                    'action' => 'STATUS',
+                    'core' => $core,
+                    'wt' => 'json'
+                ]
+            ])
+            ->once()
+            ->andReturn($request);
+
+        return new Client($guzzle);
+    }
+
+    public function testStatus()
+    {
+        $core = "foo";
+        $count = 123;
+        $status = [
+            'index' => [
+                'numDocs' => $count
+            ]
+        ];
+
+        $client = $this->setupStatus($core, $status);
+        $result = $client->core($core)->status();
+
+        $this->assertSame($result, $status);
+    }
+
+    public function testCount()
+    {
+        $core = "foo";
+        $count = 123;
+        $status = [
+            'index' => [
+                'numDocs' => $count
+            ]
+        ];
+
+        $client = $this->setupStatus($core, $status);
+        $result = $client->core($core)->count();
+
+        $this->assertSame($result, $count);
+    }
 }
