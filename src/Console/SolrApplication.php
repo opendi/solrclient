@@ -11,6 +11,7 @@ class SolrApplication extends Application
         $defaultCommands = parent::getDefaultCommands();
         $defaultCommands[] = new Commands\DeleteCommand();
         $defaultCommands[] = new Commands\ImportCommand();
+        $defaultCommands[] = new Commands\PingCommand();
         $defaultCommands[] = new Commands\StatusCommand();
         return $defaultCommands;
     }
