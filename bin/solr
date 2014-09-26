@@ -1,0 +1,12 @@
+#!/usr/bin/env php
+<?php
+
+$autoload = __DIR__ . '/../vendor/autoload.php';
+if (file_exists($autoload)) {
+    include $autoload;
+}
+
+use Opendi\Solr\Client\Console\SolrApplication;
+
+$application = new SolrApplication;
+$application->run();

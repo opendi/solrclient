@@ -121,7 +121,7 @@ class Core
     }
 
     /** Performs a GET request. */
-    private function get($path, $query = [])
+    public function get($path, $query = [])
     {
         // Set writer type to JSON
         $query['wt'] = 'json';
@@ -140,7 +140,7 @@ class Core
     }
 
     /** Performs a POST request. */
-    private function post($path, array $query = [], $body = null, array $headers = [])
+    public function post($path, array $query = [], $body = null, array $headers = [])
     {
         // Set writer type to JSON
         $query['wt'] = 'json';
