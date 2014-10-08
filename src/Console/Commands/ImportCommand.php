@@ -68,7 +68,7 @@ class ImportCommand extends AbstractCommand
 
     private function importFile($client, $core, $source, $output)
     {
-        $output->write("Importing data from: <info>$source</info>");
+        $output->writeln("Importing data from: <info>$source</info>");
 
         $path = "$core/update";
         $body = fopen($source, 'r');
@@ -89,6 +89,6 @@ class ImportCommand extends AbstractCommand
         }
 
         $time = $reply['responseHeader']['QTime'];
-        $output->writeln(" (<info>$time ms</info>)");
+        $output->writeln("Time taken: <info>$time ms</info>\n");
     }
 }
