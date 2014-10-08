@@ -4,6 +4,9 @@ namespace Opendi\Solr\Client\Console;
 
 use Opendi\Solr\Client\Client;
 
+use GuzzleHttp\Event\BeforeEvent;
+use GuzzleHttp\Event\HeadersEvent;
+
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -67,16 +70,18 @@ abstract class AbstractCommand extends Command
         $username = $input->getOption('username');
         $password = $input->getOption('password');
 
+        // Add trailing slash if one doesn't exist
+        if ($baseURL[strlen($baseURL) - 1] !== '/') {
+            $baseURL .= '/';
+        }
+
         $output->writeln("Solr URL: <info>$baseURL</info>");
 
         if (!empty($username)) {
             $output->writeln("Basic auth: <info>$username</info>");
         }
 
-        // Add trailing slash if one doesn't exist
-        if ($baseURL[strlen($baseURL) - 1] !== '/') {
-            $baseURL .= '/';
-        }
+        $output->writeln("");
 
         // Guzzle options
         $options = ['base_url' => $baseURL];
@@ -86,6 +91,29 @@ abstract class AbstractCommand extends Command
 
         // Construct and return the client
         $http = new \GuzzleHttp\Client($options);
+
+        // Set up query logging
+        $emitter = $http->getEmitter();
+
+        $emitter->on('before', function (BeforeEvent $e) use ($output) {
+            $url = $e->getRequest()->getUrl();
+            $method = $e->getRequest()->getMethod();
+
+            $output->write(sprintf("<info>%s</info> %s ", $method, $url));
+        });
+
+        $emitter->on('headers', function (HeadersEvent $e) use ($output) {
+            $code = $e->getResponse()->getStatusCode();
+            $reason = $e->getResponse()->getReasonPhrase();
+
+            if ($code < 300) {
+                $msg = "<info>$code $reason</info>";
+            } else {
+                $msg = "<error>$code $reason</error>";
+            }
+
+            $output->writeln($msg);
+        });
 
         return new Client($http);
     }
