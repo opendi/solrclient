@@ -27,18 +27,20 @@ use Opendi\Lang\Json;
 class Core
 {
     /**
-     * @var \GuzzleHttp\Client
+     * The Solr Client, used for making requests.
+     *
+     * @var Opendi\Solr\Client\Client
      */
-    private $guzzle;
+    private $client;
 
     /**
      * Name of the core.
      */
     private $name;
 
-    public function __construct(Guzzle $guzzle, $name)
+    public function __construct(Client $client, $name)
     {
-        $this->guzzle = $guzzle;
+        $this->client = $client;
         $this->name = $name;
     }
 
@@ -47,7 +49,7 @@ class Core
         $query = $select->render();
         $url = "$this->name/select?$query";
 
-        $response = $this->guzzle->get($url);
+        $response = $this->client->get($url);
 
         return (string) $response->getBody(true);
     }
@@ -57,7 +59,7 @@ class Core
         $query = $update->render();
         $url = "$this->name/update?$query";
 
-        $response = $this->guzzle->post($url, [
+        $response = $this->client->post($url, [
             'body' => $update->getBody(),
             'headers' => ['Content-Type' => 'application/json']
         ]);
@@ -68,16 +70,19 @@ class Core
     /**
      * Returns core status info.
      *
-     * @return object
+     * @return array
      */
     public function status()
     {
         $core = $this->name;
-
-        $data = $this->get("admin/cores", [
+        $path = "admin/cores";
+        $query = [
             "action" => "STATUS",
             "core" => $core,
-        ]);
+            "wt" => "json"
+        ];
+
+        $data = $this->client->get($path, $query)->json();
 
         if (empty($data['status'][$core])) {
             throw new \Exception("Core \"$core\" does not exist.");
@@ -99,88 +104,64 @@ class Core
     }
 
     /**
-     * Deletes records from the core.
+     * Deletes all records from the core.
      */
-    public function delete($select = "*:*", $commit = true)
+    public function deleteAll($commit = true)
+    {
+        return $this->deleteByQuery("*:*", $commit);
+    }
+
+    /**
+     * Deletes records with the given ID.
+     */
+    public function deleteByID($id, $commit = true)
     {
         $core = $this->name;
 
         $path = "$core/update";
 
         $query = [
-            'commit' => $commit ? "true" : "false"
+            "commit" => $commit ? "true" : "false",
+            "wt" => "json"
         ];
 
-        $bodyData = Json::encode([
+        $headers = [
+            'Content-Type' => 'application/json'
+        ];
+
+        $body = Json::encode([
+            "delete" => [
+                "id" => $id
+            ]
+        ]);
+
+        return $this->client->post($path, $query, $body, $headers)->json();
+    }
+
+    /**
+     * Deletes records matching the given query.
+     */
+    public function deleteByQuery($select, $commit = true)
+    {
+        $core = $this->name;
+
+        $path = "$core/update";
+
+        $query = [
+            "commit" => $commit ? "true" : "false",
+            "wt" => "json"
+        ];
+
+        $headers = [
+            'Content-Type' => 'application/json'
+        ];
+
+        $body = Json::encode([
             "delete" => [
                 "query" => $select
             ]
         ]);
 
-        return $this->post($path, $query, $bodyData);
-    }
-
-    /** Performs a GET request. */
-    public function get($path, $query = [])
-    {
-        // Set writer type to JSON
-        $query['wt'] = 'json';
-
-        // Exectue the GET request
-        try {
-            $response = $this->guzzle->get($path, [
-                'query' => $query
-            ]);
-        } catch (RequestException $ex) {
-            $this->handleRequestException($ex);
-        }
-
-        // Decode and return data
-        return $response->json();
-    }
-
-    /** Performs a POST request. */
-    public function post($path, array $query = [], $body = null, array $headers = [])
-    {
-        // Set writer type to JSON
-        $query['wt'] = 'json';
-
-        // Set JSON content type
-        $headers['Content-Type'] = 'application/json';
-
-        $options = [
-            'query' => $query,
-            'headers' => $headers,
-        ];
-
-        if (isset($body)) {
-            $options['body'] = $body;
-        }
-
-        // Exectue the POST request
-        try {
-            $response = $this->guzzle->post($path, $options);
-        } catch (RequestException $ex) {
-            $this->handleRequestException($ex);
-        }
-
-        return $response->json();
-    }
-
-    private function handleRequestException(RequestException $ex)
-    {
-        if ($ex->hasResponse()) {
-            $response = $ex->getResponse();
-
-            $reason = $response->getReasonPhrase();
-            $code = $response->getStatusCode();
-            $data = $response->json();
-
-            $msg = $data['error']['msg'];
-
-            throw new \Exception("Solr error HTTP $code $reason:  $msg", 0, $ex);
-        }
-
-        throw new \Exception("Solr query failed", 0, $ex);
+        return $this->client->post($path, $query, $body, $headers)->json();
     }
 }

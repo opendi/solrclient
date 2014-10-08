@@ -5,8 +5,10 @@ Opendi Solr Client Changelog
 -----------
 
 * Added `Core::count()`
+* Added `Core::deleteAll()`
+* Added `Core::deleteByID()`
+* Added `Core::deleteByQuery()`
 * Added `Core::status()`
-* Added `Core::delete()`
 
 0.3.2 (2014-08-25)
 ------------------

@@ -52,34 +52,10 @@ class Client
         }
 
         if (!isset($this->cores[$name])) {
-            $this->cores[$name] = new Core($this->guzzle, $name);
+            $this->cores[$name] = new Core($this, $name);
         }
 
         return $this->cores[$name];
-    }
-
-    public function coreStatus($name = null)
-    {
-        if (isset($name) && (!is_string($name) || empty($name))) {
-            throw new InvalidArgumentException("Invalid core name.");
-        }
-
-        $query = [
-            'action' => 'STATUS',
-            'wt' => 'json'
-        ];
-
-        if (isset($name)) {
-            $query['name'] = $name;
-        }
-
-        $query = http_build_query($query);
-
-        $url = "admin/cores?$query";
-
-        return $this->guzzle
-            ->get($url)
-            ->json();
     }
 
     /**
@@ -131,5 +107,76 @@ class Client
     public function getGuzzleClient()
     {
         return $this->guzzle;
+    }
+
+    /**
+     * Performs a GET request.
+     *
+     * @param  string $path
+     * @param  array  $query
+     *
+     * @return GuzzleHttp\Message\Response
+     */
+    public function get($path, array $query = [])
+    {
+        // Exectue the GET request
+        try {
+            $response = $this->guzzle->get($path, [
+                'query' => $query
+            ]);
+        } catch (RequestException $ex) {
+            $this->handleRequestException($ex);
+        }
+
+        // Decode and return data
+        return $response;
+    }
+
+    /**
+     * Performs a POST request.
+     *
+     * @param  string $path
+     * @param  array  $query
+     * @param  mixed  $body
+     * @param  array  $headers
+     *
+     * @return GuzzleHttp\Message\Response
+     */
+    public function post($path, array $query = [], $body = null, array $headers = [])
+    {
+        $options = [
+            'query' => $query,
+            'headers' => $headers,
+        ];
+
+        if (isset($body)) {
+            $options['body'] = $body;
+        }
+
+        // Exectue the POST request
+        try {
+            $response = $this->guzzle->post($path, $options);
+        } catch (RequestException $ex) {
+            $this->handleRequestException($ex);
+        }
+
+        return $response;
+    }
+
+    private function handleRequestException(RequestException $ex)
+    {
+        if ($ex->hasResponse()) {
+            $response = $ex->getResponse();
+
+            $reason = $response->getReasonPhrase();
+            $code = $response->getStatusCode();
+            $data = $response->json();
+
+            $msg = $data['error']['msg'];
+
+            throw new \Exception("Solr error HTTP $code $reason:  $msg", 0, $ex);
+        }
+
+        throw new \Exception("Solr query failed", 0, $ex);
     }
 }

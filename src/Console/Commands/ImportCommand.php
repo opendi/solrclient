@@ -40,13 +40,12 @@ class ImportCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $coreName = $input->getArgument('core');
+        $core = $input->getArgument('core');
         $source = $input->getArgument('source');
 
         $client = $this->getClient($input, $output);
-        $core = $client->core($coreName);
 
-        $output->writeln("Collection: <info>$coreName</info>");
+        $output->writeln("Collection: <info>$core</info>");
         $output->writeln("--");
 
         if (!file_exists($source)) {
@@ -58,25 +57,32 @@ class ImportCommand extends AbstractCommand
             $finder->files()->in($source);
 
             foreach ($finder as $file) {
-                $this->importFile($core, $coreName, $file, $output);
+                $this->importFile($client, $core, $file, $output);
             }
         } else {
-            $this->importFile($core, $coreName, $source, $output);
+            $this->importFile($client, $core, $source, $output);
         }
 
         $output->writeln("<info>Done.</info>");
     }
 
-    private function importFile($core, $coreName, $source, $output)
+    private function importFile($client, $core, $source, $output)
     {
         $output->write("Importing data from: <info>$source</info>");
 
-        $path = "$coreName/update";
-        $query = ["commit" => "true"];
+        $path = "$core/update";
         $body = fopen($source, 'r');
-        $headers = ['Content-Type' => 'application/json'];
 
-        $reply = $core->post($path, $query, $body, $headers);
+        $query = [
+            'commit' => 'true',
+            'wt' => 'json'
+        ];
+
+        $headers = [
+            'Content-Type' => 'application/json'
+        ];
+
+        $reply = $client->post($path, $query, $body, $headers)->json();
 
         if ($reply['responseHeader']['status'] != 0) {
             throw new \Exception("Solr returned an error.");
