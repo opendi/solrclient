@@ -54,7 +54,7 @@ class ImportCommand extends AbstractCommand
 
         if (is_dir($source)) {
             $finder = new Finder();
-            $finder->files()->in($source);
+            $finder->files()->in($source)->sortByName();
 
             foreach ($finder as $file) {
                 $this->importFile($client, $core, $file, $output);
