@@ -50,7 +50,7 @@ class DeleteCommand extends AbstractCommand
 
         $output->writeln("Deleting <comment>$count</comment> entries...");
 
-        $client->core($core)->delete();
+        $client->core($core)->deleteAll();
 
         $output->writeln("<info>Done.</info>");
     }
