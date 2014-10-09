@@ -4,8 +4,11 @@ namespace Opendi\Solr\Client\Console;
 
 use Opendi\Solr\Client\Client;
 
+use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Event\BeforeEvent;
+use GuzzleHttp\Event\ErrorEvent;
 use GuzzleHttp\Event\HeadersEvent;
+use GuzzleHttp\Exception\ParseException;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -90,11 +93,18 @@ abstract class AbstractCommand extends Command
         }
 
         // Construct and return the client
-        $http = new \GuzzleHttp\Client($options);
+        $guzzle = new GuzzleClient($options);
 
-        // Set up query logging
-        $emitter = $http->getEmitter();
+        $this->setupRequestLogging($guzzle, $output);
 
+        return new Client($guzzle);
+    }
+
+    private function setupRequestLogging(GuzzleClient $guzzle, $output)
+    {
+        $emitter = $guzzle->getEmitter();
+
+        //  Show the method and URL before each request
         $emitter->on('before', function (BeforeEvent $e) use ($output) {
             $url = $e->getRequest()->getUrl();
             $method = $e->getRequest()->getMethod();
@@ -102,6 +112,7 @@ abstract class AbstractCommand extends Command
             $output->write(sprintf("<info>%s</info> %s ", $method, $url));
         });
 
+        // Show status code after the request
         $emitter->on('headers', function (HeadersEvent $e) use ($output) {
             $code = $e->getResponse()->getStatusCode();
             $reason = $e->getResponse()->getReasonPhrase();
@@ -115,6 +126,23 @@ abstract class AbstractCommand extends Command
             $output->writeln($msg);
         });
 
-        return new Client($http);
+        // On error, display the Solr error message from the response
+        $emitter->on('error', function (ErrorEvent $e) use ($output) {
+            $response = $e->getResponse();
+            $contentType = $response->getHeader('Content-Type');
+
+            try {
+                $data = $response->json();
+
+                if (isset($data['error']['msg'])) {
+                    $error = "Solr error: " . $data['error']['msg'];
+
+                    $output-> writeln("");
+                    $output-> writeln("<error>$error</error>");
+                }
+            } catch (ParseException $e) {
+                // Cannot parse :(
+            }
+        });
     }
 }
