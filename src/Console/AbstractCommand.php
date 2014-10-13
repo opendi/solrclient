@@ -128,11 +128,8 @@ abstract class AbstractCommand extends Command
 
         // On error, display the Solr error message from the response
         $emitter->on('error', function (ErrorEvent $e) use ($output) {
-            $response = $e->getResponse();
-            $contentType = $response->getHeader('Content-Type');
-
             try {
-                $data = $response->json();
+                $data = $e->getResponse()->json();
 
                 if (isset($data['error']['msg'])) {
                     $error = "Solr error: " . $data['error']['msg'];
