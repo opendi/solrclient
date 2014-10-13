@@ -65,7 +65,8 @@ class Group
 
     /**
      * How to sort the groups relative to each other.
-     * For example, sort=popularity desc will cause the groups to be sorted according to the highest popularity doc in each group.
+     * For example, sort=popularity desc will cause the groups
+     * to be sorted according to the highest popularity doc in each group.
      * Defaults to "score desc".
      *
      * @param  string $sort Sort value.
@@ -98,33 +99,6 @@ class Group
     public function offset($offset)
     {
         return $this->param('group.offset', $offset);
-    }
-
-    /**
-     * The number of groups to return.
-     *
-     * Defaults to 10.
-     *
-     * @param integer $rows.
-     *
-     * @return Group
-     */
-    public function rows($rows)
-    {
-        return $this->param('rows', $rows);
-    }
-
-
-    /**
-     * The offset into the list of groups.
-     *
-     * @param integer $offset.
-     *
-     * @return Group
-     */
-    public function start($offset)
-    {
-        return $this->param('start', $offset);
     }
 
     /**
@@ -186,12 +160,14 @@ class Group
     /**
      * Whether to compute grouped facets for the field facets specified in facet.field parameters.
      * Grouped facets are computed based on the first specified group.
-     * Just like normal field faceting, fields shouldn't be tokenized (otherwise counts are computed for each token).
+     * Just like normal field faceting, fields shouldn't be tokenized
+     * (otherwise counts are computed for each token).
      * Grouped faceting supports single and multivalued fields.
      * Default is false.
      * Solr4.0
      *
-     * WARNING: If this parameter is set to true on a sharded environment, all the documents that belong to the same group have to be located in the same shard,
+     * WARNING: If this parameter is set to true on a sharded environment, all the documents
+     * that belong to the same group have to be located in the same shard,
      * otherwise the count will be incorrect. If you are using SolrCloud, consider using "custom hashing"
      *
      * @return Group
@@ -206,8 +182,9 @@ class Group
      * This option caches the second search. A value of 0 disables grouping caching.
      * Default is 0.
      *
-     * Tests have shown that this cache only improves search time with boolean queries, wildcard queries and fuzzy queries.
-     * For simple queries like a term query or a match all query this cache has a negative impact on performance
+     * Tests have shown that this cache only improves search time with boolean queries,
+     * wildcard queries and fuzzy queries. For simple queries like a term query or a match
+     * all query this cache has a negative impact on performance
      *
      * @param integer $number
      * @return Group

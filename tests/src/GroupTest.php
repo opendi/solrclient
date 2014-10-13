@@ -46,14 +46,6 @@ class GroupTest extends \PHPUnit_Framework_TestCase
 
     public function testSort()
     {
-        $actual = Solr::group()->field('foo')->sort('score desc')->render();
-        $expected = "group=true&group.field=foo&sort=score+desc";
-        $this->assertSame($expected, $actual);
-
-        $actual = Solr::group()->field('foo')->sort('popularity desc')->render();
-        $expected = "group=true&group.field=foo&sort=popularity+desc";
-        $this->assertSame($expected, $actual);
-
         $actual = Solr::group()->field('foo')->groupSort('foo desc')->render();
         $expected = "group=true&group.field=foo&group.sort=foo+desc";
         $this->assertSame($expected, $actual);
