@@ -98,9 +98,14 @@ class Core
      */
     public function count()
     {
-        $status = $this->status();
+        $select = Solr::select()
+            ->search('*:*')
+            ->rows(0)
+            ->format('json');
 
-        return $status['index']['numDocs'];
+        $result = Json::decode($this->select($select));
+
+        return $result->response->numFound;
     }
 
     /**
