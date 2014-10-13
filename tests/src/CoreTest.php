@@ -24,6 +24,8 @@ use Opendi\Solr\Client\Solr;
 use Opendi\Solr\Client\Update;
 use Opendi\Solr\Client\Core;
 
+use Opendi\Lang\Json;
+
 class CoreTest extends \PHPUnit_Framework_TestCase
 {
     protected function tearDown()
@@ -142,16 +144,32 @@ class CoreTest extends \PHPUnit_Framework_TestCase
     {
         $core = "foo";
         $count = 123;
-        $status = [
-            'index' => [
-                'numDocs' => $count
+
+        $response = Json::encode([
+            'response' => [
+                'numFound' => $count
             ]
-        ];
+        ]);
 
-        $client = $this->setupStatus($core, $status);
-        $result = $client->core($core)->count();
+        $coreName = "foo";
+        $path = "$coreName/select?q=" . urlencode("*:*") . "&wt=json&rows=0";
+        $expected = "123";
 
-        $this->assertSame($result, $count);
+        $mockResponse = m::mock('GuzzleHttp\\Message\\Response');
+        $mockResponse->shouldReceive('getBody')
+            ->once()
+            ->andReturn($response);
+
+        $mockClient = m::mock(Client::class);
+        $mockClient->shouldReceive('get')
+            ->once()
+            ->with($path)
+            ->andReturn($mockResponse);
+
+        $core = new Core($mockClient, $coreName);
+        $actual = $core->count();
+
+        $this->assertSame($actual, $count);
     }
 
     public function testDeleteAll()
