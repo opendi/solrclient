@@ -40,6 +40,24 @@ class Client
     }
 
     /**
+     * Helper factory method for creating a new Client instance.
+     *
+     * @param  string $url      URL to the solr instance.
+     * @param  array  $defaults Default options for guzzle.
+     *
+     * @return Opendi\Solr\Client\Client
+     */
+    public static function factory($url, array $defaults = [])
+    {
+        $guzzle = new Guzzle([
+            'base_url' => $url,
+            'defaults' => $defaults
+        ]);
+
+        return new self($guzzle);
+    }
+
+    /**
      * Returns a Core object for the given core name.
      *
      * @param  String $name

@@ -27,6 +27,22 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         m::close();
     }
 
+    public function testFactory()
+    {
+        $url = "www.google.com";
+        $timeout = 666;
+        $defaults = [
+            'timeout' => $timeout
+        ];
+
+        $client = Client::factory($url, $defaults);
+
+        $guzzle = $client->getGuzzleClient();
+
+        $this->assertSame($url, $guzzle->getBaseURL());
+        $this->assertSame($timeout, $guzzle->getDefaultOption('timeout'));
+    }
+
     /**
      * @expectedException Opendi\Solr\Client\SolrException
      * @expectedExceptionMessage You need to set a base_url on Guzzle client.

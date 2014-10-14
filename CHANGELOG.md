@@ -9,6 +9,7 @@ Opendi Solr Client Changelog
 * Added `Core::deleteByID()`
 * Added `Core::deleteByQuery()`
 * Added `Core::status()`
+* Added `Client::factory()` for easier client construction
 
 0.3.2 (2014-08-25)
 ------------------

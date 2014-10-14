@@ -13,7 +13,7 @@ the Solr endpoint you wish to work with. Then use it to create a Solr Client.
 use Opendi\Solr\Client\Client;
 
 $guzzle = new \GuzzleHttp\Client([
-    'base_url' => "http://localhost:8983/solr/entries/"
+    'base_url' => "http://localhost:8983/solr/"
 ]);
 
 $client = new Client($guzzle);
@@ -26,7 +26,7 @@ timeouts to the Guzzle client.
 use Opendi\Solr\Client\Client;
 
 $guzzle = new \GuzzleHttp\Client([
-    'base_url' => "http://localhost:8983/solr/entries/",
+    'base_url' => "http://localhost:8983/solr/",
     'defaults' => [
         'timeout' => 10
     ]
@@ -37,6 +37,20 @@ $solr = new Client($guzzle);
 
 See [Guzzle documentation](http://docs.guzzlephp.org/) for all options.
 
+There is a helper `factory()` method which does the same as above.
+
+```php
+use Opendi\Solr\Client\Client;
+
+$url = "http://localhost:8983/solr/";
+
+$defaults = [
+    'timeout' => 10
+];
+
+$solr = Client::factory($url, $defaults);
+```
+
 Working with cores
 ------------------
 
@@ -45,20 +59,31 @@ the `core($name)` method on the Solr Client.
 
 ```php
 $core = $client->core('places');
+
+// Perform a select query
+$select = Solr::select()->search('name:Franz');
+$client->core('places')->select($select);
+
+// Perform an update query
+$update = Solr::update()->body('{}');
+$client->core('places')->update($update);
 ```
 
-The Core object offers various helper methods:
+The Core object also offers some helper methods:
 
 ```php
 // Returns core status
 $client->core('places')->status();
 
-// Deletes all records in the core
-$client->core('places')->delete();
-
-// Deletes records matching a selector
-$client->core('places')->delete('name:Opendi');
-
 // Returns number of documents in a core
 $client->core('places')->count();
+
+// Deletes all records in the core
+$client->core('places')->deleteAll();
+
+// Deletes records matching a selector
+$client->core('places')->deleteByQuery('name:Opendi');
+
+// Deletes record with the given ID
+$client->core('places')->deleteByID('100');
 ```
