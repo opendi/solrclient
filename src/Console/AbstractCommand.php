@@ -126,19 +126,26 @@ abstract class AbstractCommand extends Command
             $output->writeln($msg);
         });
 
-        // On error, display the Solr error message from the response
+        // On error, display the Solr error message from the response if
+        // possible
         $emitter->on('error', function (ErrorEvent $e) use ($output) {
-            try {
-                $data = $e->getResponse()->json();
+            $response = $e->getResponse();
 
-                if (isset($data['error']['msg'])) {
-                    $error = "Solr error: " . $data['error']['msg'];
+            if ($response !== null) {
+                // If there is a response, try to parse it to get the Solr error
+                try {
+                    $data = $response->json();
 
-                    $output-> writeln("");
-                    $output-> writeln("<error>$error</error>");
+                    if (isset($data['error']['msg'])) {
+                        $error = "Solr error: " . $data['error']['msg'];
+
+                        $output-> writeln("");
+                        $output-> writeln("<error>$error</error>");
+                        return;
+                    }
+                } catch (ParseException $e) {
+                    // Cannot parse :(
                 }
-            } catch (ParseException $e) {
-                // Cannot parse :(
             }
         });
     }
