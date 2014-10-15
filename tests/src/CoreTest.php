@@ -303,4 +303,48 @@ class CoreTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($retval, $actual);
     }
+
+    public function testPing()
+    {
+        $coreName = "xyz";
+        $expected = "expected response";
+
+        $response = m::mock('GuzzleHttp\\Message\\Response');
+        $response->shouldReceive('json')
+            ->andReturn($expected);
+
+        $client = m::mock(Client::class);
+        $client->shouldReceive('get')
+            ->with("$coreName/admin/ping", ["wt" => "json"])
+            ->once()
+            ->andReturn($response);
+
+        $core = new Core($client, $coreName);
+        $actual = $core->ping();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testPingCustomHandler()
+    {
+        $coreName = "xyz";
+        $expected = "expected response";
+        $handler = "foo/bar";
+
+        $response = m::mock('GuzzleHttp\\Message\\Response');
+        $response->shouldReceive('json')
+            ->andReturn($expected);
+
+        $client = m::mock(Client::class);
+        $client->shouldReceive('get')
+            ->with("$coreName/$handler", ["wt" => "json"])
+            ->once()
+            ->andReturn($response);
+
+        $core = new Core($client, $coreName);
+        $core->setPingHandler($handler);
+        $actual = $core->ping();
+
+        $this->assertSame($expected, $actual);
+    }
 }

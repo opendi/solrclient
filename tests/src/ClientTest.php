@@ -73,59 +73,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->core([]);
     }
 
-    public function testPing()
-    {
-        $guzzle = m::mock('GuzzleHttp\\Client');
-        $response = m::mock('GuzzleHttp\\Message\\Response');
-
-        $guzzle->shouldReceive('getBaseUrl')
-            ->once()
-            ->andReturn('http://localhost:8983/solr/');
-
-        $guzzle->shouldReceive('get')
-            ->with('admin/ping?wt=json')
-            ->once()
-            ->andReturn($response);
-
-        $expected = 123;
-
-        $response->shouldReceive('json')
-            ->andReturn($expected);
-
-        $client = new Client($guzzle);
-        $actual = $client->ping();
-
-        $this->assertSame($expected, $actual);
-    }
-
-    public function testPingCustomHandler()
-    {
-        $handler = "foo/bar";
-
-        $guzzle = m::mock('GuzzleHttp\\Client');
-        $response = m::mock('GuzzleHttp\\Message\\Response');
-
-        $guzzle->shouldReceive('getBaseUrl')
-            ->once()
-            ->andReturn('http://localhost:8983/solr/');
-
-        $guzzle->shouldReceive('get')
-            ->with("$handler?wt=json")
-            ->once()
-            ->andReturn($response);
-
-        $expected = 123;
-
-        $response->shouldReceive('json')
-            ->andReturn($expected);
-
-        $client = new Client($guzzle);
-        $client->setPingHandler($handler);
-        $actual = $client->ping();
-
-        $this->assertSame($expected, $actual);
-    }
-
     public function testGetEmitter()
     {
         $guzzle = m::mock('GuzzleHttp\\Client');

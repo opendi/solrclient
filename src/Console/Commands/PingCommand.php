@@ -18,19 +18,26 @@ class PingCommand extends AbstractCommand
 
         $this
             ->setName('ping')
-            ->setDescription("Pings the Solr server to check it's up.");
+            ->setDescription("Pings the Solr server to check it's up.")
+            ->addArgument(
+                'core',
+                InputArgument::REQUIRED,
+                'Name of the core to ping.'
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $client = $this->getClient($input, $output);
 
-        $ping = $client->ping();
+        $core = $input->getArgument('core');
+
+        $ping = $client->core($core)->ping();
 
         $time = $ping['responseHeader']['QTime'];
         $status = $ping['status'];
 
-        $output->writeln("Status: <info>$status</info>");
+        $output->writeln("\nStatus: <info>$status</info>");
         $output->writeln("Time: <info>$time ms</info>");
     }
 }

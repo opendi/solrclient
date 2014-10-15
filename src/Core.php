@@ -38,6 +38,11 @@ class Core
      */
     private $name;
 
+    /**
+     * Path to the Ping handler.
+     */
+    private $pingHandler = 'admin/ping';
+
     public function __construct(Client $client, $name)
     {
         $this->client = $client;
@@ -168,5 +173,37 @@ class Core
         ]);
 
         return $this->client->post($path, $query, $body, $headers)->json();
+    }
+
+    /**
+     * Pings the server to check it's there.
+     *
+     * @return array Solr's reply.
+     * @throws SolrException If server does not respond.
+     */
+    public function ping()
+    {
+        $path = implode('/', [$this->name, $this->pingHandler]);
+
+        $response = $this->client->get($path, [
+            'wt' => 'json'
+        ]);
+
+        return $response->json();
+    }
+
+    /**
+     * Sets the path to the Solr ping handler.
+     *
+     * Use a relative path, such as 'admin/ping', and not absolute like
+     * '/admin/ping', otherwise it won't work when solr base is not same as root
+     * url.
+     *
+     * @param string $handler
+     * @see https://cwiki.apache.org/confluence/display/solr/Ping
+     */
+    public function setPingHandler($handler)
+    {
+        $this->pingHandler = $handler;
     }
 }

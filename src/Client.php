@@ -26,8 +26,6 @@ class Client
 
     private $cores = [];
 
-    private $pingHandler = 'admin/ping';
-
     public function __construct(Guzzle $guzzle)
     {
         $this->guzzle = $guzzle;
@@ -74,35 +72,6 @@ class Client
         }
 
         return $this->cores[$name];
-    }
-
-    /**
-     * Pings the server to check it's there.
-     * @return array Solr's reply.
-     * @throws SolrException If server does not respond.
-     */
-    public function ping()
-    {
-        $query = $this->pingHandler . '?wt=json';
-
-        $response = $this->guzzle->get($query);
-
-        return $response->json();
-    }
-
-    /**
-     * Sets the path to the Solr ping handler.
-     *
-     * Use a relative path, such as 'admin/ping', and not absolute like
-     * '/admin/ping', otherwise it won't work when solr base is not same as root
-     * url.
-     *
-     * @param string $handler
-     * @see https://cwiki.apache.org/confluence/display/solr/Ping
-     */
-    public function setPingHandler($handler)
-    {
-        $this->pingHandler = $handler;
     }
 
     /**
