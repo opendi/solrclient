@@ -2,4 +2,5 @@
 /target
 /tmp
 /vendor
+.idea
 php_errors.log
