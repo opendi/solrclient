@@ -28,10 +28,6 @@ class GroupTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('group=true&group.field=category', $filter->render());
 
         $filter = new Group();
-        $filter->field('category')->rows(10)->limit(5);
-        $this->assertEquals('group=true&group.field=category&rows=10&group.limit=5', $filter->render());
-
-        $filter = new Group();
         $filter->field('category')->format(Group::FORMAT_GROUPED);
         $this->assertEquals('group=true&group.field=category&group.format=grouped', $filter->render());
 
@@ -52,7 +48,7 @@ class GroupTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Opendi\Solr\Client\SolrException
+     * @expectedException \Opendi\Solr\Client\SolrException
      * @expectedExceptionMessage Invalid group format
      */
     public function testFormatInvalid()
