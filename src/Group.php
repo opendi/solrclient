@@ -53,7 +53,8 @@ class Group
     }
 
     /**
-     * How to sort documents within a single group. Defaults to the same value as the sort parameter.
+     * How to sort documents within a single group. Defaults to the same value
+     * as the sort parameter.
      *
      * @param  string $sort Sort value.
      * @return Group
@@ -103,7 +104,8 @@ class Group
 
     /**
      * if simple, the grouped documents are presented in a single flat list.
-     * The start and rows parameters refer to numbers of documents instead of numbers of groups.
+     * The start and rows parameters refer to numbers of documents instead
+     * of numbers of groups.
      *
      * Possible Values are: grouped, simple
      *
@@ -113,7 +115,7 @@ class Group
      */
     public function format($format)
     {
-        if(!in_array($format,[self::FORMAT_GROUPED,self::FORMAT_SIMPLE])) {
+        if (!in_array($format,[self::FORMAT_GROUPED, self::FORMAT_SIMPLE])) {
             throw new SolrException("Invalid group format");
         }
         return $this->param('group.format', $format);
@@ -132,9 +134,13 @@ class Group
     }
 
     /**
-     * If true, includes the number of groups that have matched the query. Default is false. <!> Solr4.1
-     * WARNING: If this parameter is set to true on a sharded environment, all the documents that belong
-     * to the same group have to be located in the same shard, otherwise the count will be incorrect.
+     * If true, includes the number of groups that have matched the query.
+     * Default is false. <!> Solr4.1
+     *
+     * WARNING: If this parameter is set to true on a sharded environment,
+     * all the documents that belong to the same group have to be located
+     * in the same shard, otherwise the count will be incorrect.
+     *
      * If you are using SolrCloud, consider using "custom hashing"
      *
      * @return Group
@@ -145,8 +151,11 @@ class Group
     }
 
     /**
-     * If true, facet counts are based on the most relevant document of each group matching the query.
+     * If true, facet counts are based on the most relevant document of each
+     * group matching the query.
+     *
      * Same applies for StatsComponent (http://wiki.apache.org/solr/StatsComponent).
+     *
      * Default is false.
      * Supported from Solr 3.4 and up.
      *
@@ -158,7 +167,9 @@ class Group
     }
 
     /**
-     * Whether to compute grouped facets for the field facets specified in facet.field parameters.
+     * Whether to compute grouped facets for the field facets
+     * specified in facet.field parameters.
+     *
      * Grouped facets are computed based on the first specified group.
      * Just like normal field faceting, fields shouldn't be tokenized
      * (otherwise counts are computed for each token).
@@ -168,7 +179,8 @@ class Group
      *
      * WARNING: If this parameter is set to true on a sharded environment, all the documents
      * that belong to the same group have to be located in the same shard,
-     * otherwise the count will be incorrect. If you are using SolrCloud, consider using "custom hashing"
+     * otherwise the count will be incorrect. If you are using SolrCloud,
+     * consider using "custom hashing"
      *
      * @return Group
      */
@@ -194,10 +206,13 @@ class Group
         return $this->param('group.cache.percent', $number);
     }
 
-
-
     /**
      * Generic setter for query parameters.
+     *
+     * @param string $name
+     * @param string $value
+     * @param string $field
+     * @return $this
      */
     private function param($name, $value, $field = null)
     {
