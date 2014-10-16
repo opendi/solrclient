@@ -17,6 +17,7 @@
 namespace Opendi\Solr\Client;
 
 use GuzzleHttp\Client as Guzzle;
+use GuzzleHttp\Message\RequestInterface;
 
 use InvalidArgumentException;
 
@@ -99,50 +100,49 @@ class Client
     /**
      * Performs a GET request.
      *
-     * @param  string $path
+     * @param  string $url
      * @param  array  $query
      *
      * @return GuzzleHttp\Message\Response
      */
-    public function get($path, array $query = [])
+    public function get($url, array $query = [])
     {
-        // Exectue the GET request
-        try {
-            $response = $this->guzzle->get($path, [
-                'query' => $query
-            ]);
-        } catch (RequestException $ex) {
-            $this->handleRequestException($ex);
-        }
+        $options = [
+            'query' => $query
+        ];
 
-        // Decode and return data
-        return $response;
+        $request = $this->guzzle->createRequest('GET', $url, $options);
+
+        return $this->send($request);
     }
 
     /**
      * Performs a POST request.
      *
-     * @param  string $path
+     * @param  string $url
      * @param  array  $query
      * @param  mixed  $body
      * @param  array  $headers
      *
      * @return GuzzleHttp\Message\Response
      */
-    public function post($path, array $query = [], $body = null, array $headers = [])
+    public function post($url, array $query = [], $body = null, array $headers = [])
     {
         $options = [
             'query' => $query,
             'headers' => $headers,
+            'body' => $body
         ];
 
-        if (isset($body)) {
-            $options['body'] = $body;
-        }
+        $request = $this->guzzle->createRequest('POST', $url, $options);
 
-        // Exectue the POST request
+        return $this->send($request);
+    }
+
+    public function send(RequestInterface $request)
+    {
         try {
-            $response = $this->guzzle->post($path, $options);
+            $response = $this->guzzle->send($request);
         } catch (RequestException $ex) {
             $this->handleRequestException($ex);
         }

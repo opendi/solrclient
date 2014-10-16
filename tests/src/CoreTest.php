@@ -18,6 +18,9 @@ namespace Opendi\Solr\Client\Tests;
 
 use Mockery as m;
 
+use GuzzleHttp\Subscriber\Mock;
+use GuzzleHttp\Message\Response;
+
 use Opendi\Solr\Client\Client;
 use Opendi\Solr\Client\Select;
 use Opendi\Solr\Client\Solr;
@@ -42,7 +45,7 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $path = "$coreName/select?$query";
         $expected = "123";
 
-        $mockResponse = m::mock('GuzzleHttp\\Message\\Response');
+        $mockResponse = m::mock(Response::class);
         $mockResponse->shouldReceive('getBody')
             ->once()
             ->andReturn($expected);
@@ -73,7 +76,7 @@ class CoreTest extends \PHPUnit_Framework_TestCase
             'headers' => ['Content-Type' => 'application/json']
         ];
 
-        $mockResponse = m::mock('GuzzleHttp\\Message\\Response');
+        $mockResponse = m::mock(Response::class);
         $mockResponse->shouldReceive('getBody')
             ->once()
             ->andReturn($expected);
@@ -90,54 +93,33 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $actual);
     }
 
-    private function setupStatus($core, $status)
-    {
-        $baseUrl = "http://localhost:8983/solr/";
-
-        // Mock response
-        $response = m::mock('GuzzleHttp\\Message\\Response');
-        $response->shouldReceive('json')
-            ->once()
-            ->andReturn([
-                'status' => [
-                    $core => $status
-                ]
-            ]);
-
-        // Mock Guzzle client
-        $guzzle = m::mock('GuzzleHttp\\Client');
-        $guzzle->shouldReceive('getBaseUrl')
-            ->once()
-            ->andReturn($baseUrl);
-
-        $guzzle->shouldReceive('get')
-            ->with("admin/cores", [
-                'query' => [
-                    'action' => 'STATUS',
-                    'core' => $core,
-                    'wt' => 'json'
-                ]
-            ])
-            ->once()
-            ->andReturn($response);
-
-        return new Client($guzzle);
-    }
-
     public function testStatus()
     {
-        $core = "foo";
+        $coreName = "foo";
         $count = 123;
+        $coreStatus = ['foo' => 'bar'];
+
         $status = [
-            'index' => [
-                'numDocs' => $count
+            'status' => [
+                $coreName => $coreStatus
             ]
         ];
 
-        $client = $this->setupStatus($core, $status);
-        $result = $client->core($core)->status();
+        $mockResponse = m::mock(Response::class);
+        $mockResponse->shouldReceive('json')
+            ->once()
+            ->andReturn($status);
 
-        $this->assertSame($result, $status);
+        $mockClient = m::mock(Client::class);
+        $mockClient->shouldReceive('get')
+            ->once()
+            ->with("admin/cores", ['action' => 'STATUS', 'core' => 'foo', 'wt' => 'json'])
+            ->andReturn($mockResponse);
+
+        $core = new Core($mockClient, $coreName);
+        $actual = $core->status();
+
+        $this->assertSame($coreStatus, $actual);
     }
 
     public function testCount()
@@ -155,7 +137,7 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $path = "$coreName/select?q=" . urlencode("*:*") . "&wt=json&rows=0";
         $expected = "123";
 
-        $mockResponse = m::mock('GuzzleHttp\\Message\\Response');
+        $mockResponse = m::mock(Response::class);
         $mockResponse->shouldReceive('getBody')
             ->once()
             ->andReturn($response);
@@ -174,132 +156,90 @@ class CoreTest extends \PHPUnit_Framework_TestCase
 
     public function testDeleteAll()
     {
-        $baseUrl = "http://localhost:8983/solr/";
         $retval = 123;
-        $core = "xxx";
+        $coreName = "xxx";
 
-        // Mock response
-        $response = m::mock('GuzzleHttp\\Message\\Response');
-        $response->shouldReceive('json')
+        $path = "$coreName/update";
+        $query = [
+            'commit' => 'true',
+            'wt' => 'json',
+        ];
+        $body = '{"delete":{"query":"*:*"}}';
+        $headers = ['Content-Type' => 'application/json'];
+
+        $mockResponse = m::mock(Response::class);
+        $mockResponse->shouldReceive('json')
             ->once()
             ->andReturn($retval);
 
-        // Mock Guzzle client
-        $guzzle = m::mock('GuzzleHttp\\Client');
-        $guzzle->shouldReceive('getBaseUrl')
+        $mockClient = m::mock(Client::class);
+        $mockClient->shouldReceive('post')
             ->once()
-            ->andReturn($baseUrl);
+            ->with($path, $query, $body, $headers)
+            ->andReturn($mockResponse);
 
-        $path = "$core/update";
-        $options = [
-            'query' => [
-                'commit' => 'true',
-                'wt' => 'json',
-            ],
-            'headers' => [
-                'Content-Type' => 'application/json'
-            ],
-            'body' => '{"delete":{"query":"*:*"}}'
-        ];
+        $core = new Core($mockClient, $coreName);
 
-        $guzzle->shouldReceive('post')
-            ->with($path, $options)
-            ->once()
-            ->andReturn($response);
-
-        $client = new Client($guzzle);
-
-        $actual = $client->core($core)->deleteAll();
+        $actual = $core->deleteAll();
 
         $this->assertSame($retval, $actual);
     }
 
     public function testDeleteByQuery()
     {
-        $baseUrl = "http://localhost:8983/solr/";
         $retval = 123;
-        $core = "xxx";
-
+        $coreName = "xxx";
         $select = "name:ivan";
-        $commit = false;
 
-        // Mock response
-        $response = m::mock('GuzzleHttp\\Message\\Response');
-        $response->shouldReceive('json')
+        $path = "$coreName/update";
+        $query = ['commit' => 'true', 'wt' => 'json'];
+        $body = json_encode(["delete" => ["query" => $select]]);
+        $headers = ['Content-Type' => 'application/json'];
+
+        $mockResponse = m::mock(Response::class);
+        $mockResponse->shouldReceive('json')
             ->once()
             ->andReturn($retval);
 
-        // Mock Guzzle client
-        $guzzle = m::mock('GuzzleHttp\\Client');
-        $guzzle->shouldReceive('getBaseUrl')
+        $mockClient = m::mock(Client::class);
+        $mockClient->shouldReceive('post')
             ->once()
-            ->andReturn($baseUrl);
+            ->with($path, $query, $body, $headers)
+            ->andReturn($mockResponse);
 
-        $path = "$core/update";
-        $options = [
-            'query' => [
-                'commit' => 'false',
-                'wt' => 'json',
-            ],
-            'headers' => [
-                'Content-Type' => 'application/json'
-            ],
-            'body' => '{"delete":{"query":"' . $select . '"}}'
-        ];
+        $core = new Core($mockClient, $coreName);
 
-        $guzzle->shouldReceive('post')
-            ->with($path, $options)
-            ->once()
-            ->andReturn($response);
-
-        $client = new Client($guzzle);
-
-        $actual = $client->core($core)->deleteByQuery("name:ivan", false);
+        $actual = $core->deleteByQuery($select);
 
         $this->assertSame($retval, $actual);
     }
 
     public function testDeleteByID()
     {
-        $baseUrl = "http://localhost:8983/solr/";
-        $retval = 123;
-        $core = "xxx";
-
         $id = 666;
-        $commit = false;
+        $retval = 123;
+        $coreName = "xxx";
+        $select = "name:ivan";
 
-        // Mock response
-        $response = m::mock('GuzzleHttp\\Message\\Response');
-        $response->shouldReceive('json')
+        $path = "$coreName/update";
+        $query = ['commit' => 'true', 'wt' => 'json'];
+        $body = json_encode(["delete" => ["id" => $id]]);
+        $headers = ['Content-Type' => 'application/json'];
+
+        $mockResponse = m::mock(Response::class);
+        $mockResponse->shouldReceive('json')
             ->once()
             ->andReturn($retval);
 
-        // Mock Guzzle client
-        $guzzle = m::mock('GuzzleHttp\\Client');
-        $guzzle->shouldReceive('getBaseUrl')
+        $mockClient = m::mock(Client::class);
+        $mockClient->shouldReceive('post')
             ->once()
-            ->andReturn($baseUrl);
+            ->with($path, $query, $body, $headers)
+            ->andReturn($mockResponse);
 
-        $path = "$core/update";
-        $options = [
-            'query' => [
-                'commit' => 'false',
-                'wt' => 'json',
-            ],
-            'headers' => [
-                'Content-Type' => 'application/json'
-            ],
-            'body' => '{"delete":{"id":' . $id . '}}'
-        ];
+        $core = new Core($mockClient, $coreName);
 
-        $guzzle->shouldReceive('post')
-            ->with($path, $options)
-            ->once()
-            ->andReturn($response);
-
-        $client = new Client($guzzle);
-
-        $actual = $client->core($core)->deleteByID($id, false);
+        $actual = $core->deleteByID($id);
 
         $this->assertSame($retval, $actual);
     }
@@ -309,7 +249,7 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $coreName = "xyz";
         $expected = "expected response";
 
-        $response = m::mock('GuzzleHttp\\Message\\Response');
+        $response = m::mock(Response::class);
         $response->shouldReceive('json')
             ->andReturn($expected);
 
@@ -331,7 +271,7 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $expected = "expected response";
         $handler = "foo/bar";
 
-        $response = m::mock('GuzzleHttp\\Message\\Response');
+        $response = m::mock(Response::class);
         $response->shouldReceive('json')
             ->andReturn($expected);
 
