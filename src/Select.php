@@ -47,6 +47,9 @@ class Select extends Expression
     /** @var Facet */
     private $facet = null;
 
+    /** @var Group */
+    private $group = null;
+
     private $indent = false;
     private $format = null;
 
@@ -119,6 +122,13 @@ class Select extends Expression
     public function facet(Facet $facet)
     {
         $this->facet = $facet;
+
+        return $this;
+    }
+
+    public function group(Group $group)
+    {
+        $this->group = $group;
 
         return $this;
     }
@@ -217,6 +227,10 @@ class Select extends Expression
 
         if ($this->facet != null) {
             $query .= '&'. $this->facet->render();
+        }
+
+        if ($this->group != null) {
+            $query .= '&'. $this->group->render();
         }
 
         if ($this->raw != null) {
