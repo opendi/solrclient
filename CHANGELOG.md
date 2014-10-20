@@ -1,6 +1,12 @@
 Opendi Solr Client Changelog
 ============================
 
+0.4.0 (2014-10-20)
+------------------
+
+* Added `Group` class for better sorting 
+* Added `Solr:group()`
+
 0.3.3 (TBA)
 -----------
 

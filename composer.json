@@ -2,7 +2,6 @@
     "name": "opendi/solrclient",
     "type": "library",
     "description": "Client for Apache Solr",
-    "version": "0.4.0",
     "keywords": ["solr"],
     "homepage": "https://github.com/opendi/solrclient",
     "license": "Apache-2.0",
