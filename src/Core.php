@@ -17,6 +17,9 @@
 namespace Opendi\Solr\Client;
 
 use GuzzleHttp\Client as Guzzle;
+use GuzzleHttp\Exception\RequestException;
+
+use Opendi\Lang\Json;
 
 /**
  * Functionality which can be invoked on a Solr core.
@@ -24,18 +27,25 @@ use GuzzleHttp\Client as Guzzle;
 class Core
 {
     /**
-     * @var \GuzzleHttp\Client
+     * The Solr Client, used for making requests.
+     *
+     * @var Opendi\Solr\Client\Client
      */
-    private $guzzle;
+    private $client;
 
     /**
      * Name of the core.
      */
     private $name;
 
-    public function __construct(Guzzle $guzzle, $name)
+    /**
+     * Path to the Ping handler.
+     */
+    private $pingHandler = 'admin/ping';
+
+    public function __construct(Client $client, $name)
     {
-        $this->guzzle = $guzzle;
+        $this->client = $client;
         $this->name = $name;
     }
 
@@ -44,7 +54,7 @@ class Core
         $query = $select->render();
         $url = "$this->name/select?$query";
 
-        $response = $this->guzzle->get($url);
+        $response = $this->client->get($url);
 
         return (string) $response->getBody(true);
     }
@@ -54,11 +64,146 @@ class Core
         $query = $update->render();
         $url = "$this->name/update?$query";
 
-        $response = $this->guzzle->post($url, [
+        $response = $this->client->post($url, [
             'body' => $update->getBody(),
             'headers' => ['Content-Type' => 'application/json']
         ]);
 
         return (string) $response->getBody(true);
+    }
+
+    /**
+     * Returns core status info.
+     *
+     * @return array
+     */
+    public function status()
+    {
+        $core = $this->name;
+        $path = "admin/cores";
+        $query = [
+            "action" => "STATUS",
+            "core" => $core,
+            "wt" => "json"
+        ];
+
+        $data = $this->client->get($path, $query)->json();
+
+        if (empty($data['status'][$core])) {
+            throw new \Exception("Core \"$core\" does not exist.");
+        }
+
+        return $data['status'][$core];
+    }
+
+    /**
+     * Returns the number of records in the core.
+     *
+     * @return integer
+     */
+    public function count()
+    {
+        $select = Solr::select()
+            ->search('*:*')
+            ->rows(0)
+            ->format('json');
+
+        $result = Json::decode($this->select($select));
+
+        return $result->response->numFound;
+    }
+
+    /**
+     * Deletes all records from the core.
+     */
+    public function deleteAll($commit = true)
+    {
+        return $this->deleteByQuery("*:*", $commit);
+    }
+
+    /**
+     * Deletes records with the given ID.
+     */
+    public function deleteByID($id, $commit = true)
+    {
+        $core = $this->name;
+
+        $path = "$core/update";
+
+        $query = [
+            "commit" => $commit ? "true" : "false",
+            "wt" => "json"
+        ];
+
+        $headers = [
+            'Content-Type' => 'application/json'
+        ];
+
+        $body = Json::encode([
+            "delete" => [
+                "id" => $id
+            ]
+        ]);
+
+        return $this->client->post($path, $query, $body, $headers)->json();
+    }
+
+    /**
+     * Deletes records matching the given query.
+     */
+    public function deleteByQuery($select, $commit = true)
+    {
+        $core = $this->name;
+
+        $path = "$core/update";
+
+        $query = [
+            "commit" => $commit ? "true" : "false",
+            "wt" => "json"
+        ];
+
+        $headers = [
+            'Content-Type' => 'application/json'
+        ];
+
+        $body = Json::encode([
+            "delete" => [
+                "query" => $select
+            ]
+        ]);
+
+        return $this->client->post($path, $query, $body, $headers)->json();
+    }
+
+    /**
+     * Pings the server to check it's there.
+     *
+     * @return array Solr's reply.
+     * @throws SolrException If server does not respond.
+     */
+    public function ping()
+    {
+        $path = implode('/', [$this->name, $this->pingHandler]);
+
+        $response = $this->client->get($path, [
+            'wt' => 'json'
+        ]);
+
+        return $response->json();
+    }
+
+    /**
+     * Sets the path to the Solr ping handler.
+     *
+     * Use a relative path, such as 'admin/ping', and not absolute like
+     * '/admin/ping', otherwise it won't work when solr base is not same as root
+     * url.
+     *
+     * @param string $handler
+     * @see https://cwiki.apache.org/confluence/display/solr/Ping
+     */
+    public function setPingHandler($handler)
+    {
+        $this->pingHandler = $handler;
     }
 }

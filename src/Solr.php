@@ -50,4 +50,9 @@ class Solr
     {
         return new Update();
     }
+
+    public static function group()
+    {
+        return new Group();
+    }
 }

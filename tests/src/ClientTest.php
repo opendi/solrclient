@@ -27,6 +27,22 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         m::close();
     }
 
+    public function testFactory()
+    {
+        $url = "www.google.com";
+        $timeout = 666;
+        $defaults = [
+            'timeout' => $timeout
+        ];
+
+        $client = Client::factory($url, $defaults);
+
+        $guzzle = $client->getGuzzleClient();
+
+        $this->assertSame($url, $guzzle->getBaseURL());
+        $this->assertSame($timeout, $guzzle->getDefaultOption('timeout'));
+    }
+
     /**
      * @expectedException Opendi\Solr\Client\SolrException
      * @expectedExceptionMessage You need to set a base_url on Guzzle client.
@@ -55,120 +71,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $client = new Client($guzzle);
         $client->core([]);
-    }
-
-    public function testCoreStatus()
-    {
-        $guzzle = m::mock('GuzzleHttp\\Client');
-        $response = m::mock('GuzzleHttp\\Message\\Response');
-
-        $guzzle->shouldReceive('getBaseUrl')
-            ->once()
-            ->andReturn('http://localhost:8983/solr/');
-
-        $guzzle->shouldReceive('get')
-            ->with('admin/cores?action=STATUS&wt=json')
-            ->once()
-            ->andReturn($response);
-
-        $response->shouldReceive('json')
-            ->andReturn(123);
-
-        $client = new Client($guzzle);
-        $status = $client->coreStatus();
-
-        $this->assertSame(123, $status);
-    }
-
-    public function testSingleCoreStatus()
-    {
-        $guzzle = m::mock('GuzzleHttp\\Client');
-        $response = m::mock('GuzzleHttp\\Message\\Response');
-
-        $guzzle->shouldReceive('getBaseUrl')
-            ->once()
-            ->andReturn('http://localhost:8983/solr/');
-
-        $guzzle->shouldReceive('get')
-            ->with('admin/cores?action=STATUS&wt=json&name=foo')
-            ->once()
-            ->andReturn($response);
-
-        $response->shouldReceive('json')
-            ->andReturn(123);
-
-        $client = new Client($guzzle);
-        $status = $client->coreStatus('foo');
-
-        $this->assertSame(123, $status);
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid core name
-     */
-    public function testCoreStatusInvalidName()
-    {
-        $guzzle = m::mock('GuzzleHttp\\Client');
-        $guzzle->shouldReceive('getBaseUrl')
-            ->once()
-            ->andReturn('http://localhost:8983/solr/');
-
-        $client = new Client($guzzle);
-        $client->coreStatus([]);
-    }
-
-    public function testPing()
-    {
-        $guzzle = m::mock('GuzzleHttp\\Client');
-        $response = m::mock('GuzzleHttp\\Message\\Response');
-
-        $guzzle->shouldReceive('getBaseUrl')
-            ->once()
-            ->andReturn('http://localhost:8983/solr/');
-
-        $guzzle->shouldReceive('get')
-            ->with('admin/ping?wt=json')
-            ->once()
-            ->andReturn($response);
-
-        $expected = 123;
-
-        $response->shouldReceive('json')
-            ->andReturn($expected);
-
-        $client = new Client($guzzle);
-        $actual = $client->ping();
-
-        $this->assertSame($expected, $actual);
-    }
-
-    public function testPingCustomHandler()
-    {
-        $handler = "foo/bar";
-
-        $guzzle = m::mock('GuzzleHttp\\Client');
-        $response = m::mock('GuzzleHttp\\Message\\Response');
-
-        $guzzle->shouldReceive('getBaseUrl')
-            ->once()
-            ->andReturn('http://localhost:8983/solr/');
-
-        $guzzle->shouldReceive('get')
-            ->with("$handler?wt=json")
-            ->once()
-            ->andReturn($response);
-
-        $expected = 123;
-
-        $response->shouldReceive('json')
-            ->andReturn($expected);
-
-        $client = new Client($guzzle);
-        $client->setPingHandler($handler);
-        $actual = $client->ping();
-
-        $this->assertSame($expected, $actual);
     }
 
     public function testGetEmitter()

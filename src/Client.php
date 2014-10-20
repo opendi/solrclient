@@ -17,6 +17,7 @@
 namespace Opendi\Solr\Client;
 
 use GuzzleHttp\Client as Guzzle;
+use GuzzleHttp\Message\RequestInterface;
 
 use InvalidArgumentException;
 
@@ -25,8 +26,6 @@ class Client
     private $guzzle;
 
     private $cores = [];
-
-    private $pingHandler = 'admin/ping';
 
     public function __construct(Guzzle $guzzle)
     {
@@ -37,6 +36,24 @@ class Client
         if (empty($base)) {
             throw new SolrException("You need to set a base_url on Guzzle client.");
         }
+    }
+
+    /**
+     * Helper factory method for creating a new Client instance.
+     *
+     * @param  string $url      URL to the solr instance.
+     * @param  array  $defaults Default options for guzzle.
+     *
+     * @return Opendi\Solr\Client\Client
+     */
+    public static function factory($url, array $defaults = [])
+    {
+        $guzzle = new Guzzle([
+            'base_url' => $url,
+            'defaults' => $defaults
+        ]);
+
+        return new self($guzzle);
     }
 
     /**
@@ -52,63 +69,10 @@ class Client
         }
 
         if (!isset($this->cores[$name])) {
-            $this->cores[$name] = new Core($this->guzzle, $name);
+            $this->cores[$name] = new Core($this, $name);
         }
 
         return $this->cores[$name];
-    }
-
-    public function coreStatus($name = null)
-    {
-        if (isset($name) && (!is_string($name) || empty($name))) {
-            throw new InvalidArgumentException("Invalid core name.");
-        }
-
-        $query = [
-            'action' => 'STATUS',
-            'wt' => 'json'
-        ];
-
-        if (isset($name)) {
-            $query['name'] = $name;
-        }
-
-        $query = http_build_query($query);
-
-        $url = "admin/cores?$query";
-
-        return $this->guzzle
-            ->get($url)
-            ->json();
-    }
-
-    /**
-     * Pings the server to check it's there.
-     * @return array Solr's reply.
-     * @throws SolrException If server does not respond.
-     */
-    public function ping()
-    {
-        $query = $this->pingHandler . '?wt=json';
-
-        $response = $this->guzzle->get($query);
-
-        return $response->json();
-    }
-
-    /**
-     * Sets the path to the Solr ping handler.
-     *
-     * Use a relative path, such as 'admin/ping', and not absolute like
-     * '/admin/ping', otherwise it won't work when solr base is not same as root
-     * url.
-     *
-     * @param string $handler
-     * @see https://cwiki.apache.org/confluence/display/solr/Ping
-     */
-    public function setPingHandler($handler)
-    {
-        $this->pingHandler = $handler;
     }
 
     /**
@@ -131,5 +95,75 @@ class Client
     public function getGuzzleClient()
     {
         return $this->guzzle;
+    }
+
+    /**
+     * Performs a GET request.
+     *
+     * @param  string $url
+     * @param  array  $query
+     *
+     * @return GuzzleHttp\Message\Response
+     */
+    public function get($url, array $query = [])
+    {
+        $options = [
+            'query' => $query
+        ];
+
+        $request = $this->guzzle->createRequest('GET', $url, $options);
+
+        return $this->send($request);
+    }
+
+    /**
+     * Performs a POST request.
+     *
+     * @param  string $url
+     * @param  array  $query
+     * @param  mixed  $body
+     * @param  array  $headers
+     *
+     * @return GuzzleHttp\Message\Response
+     */
+    public function post($url, array $query = [], $body = null, array $headers = [])
+    {
+        $options = [
+            'query' => $query,
+            'headers' => $headers,
+            'body' => $body
+        ];
+
+        $request = $this->guzzle->createRequest('POST', $url, $options);
+
+        return $this->send($request);
+    }
+
+    public function send(RequestInterface $request)
+    {
+        try {
+            $response = $this->guzzle->send($request);
+        } catch (RequestException $ex) {
+            $this->handleRequestException($ex);
+        }
+
+        return $response;
+    }
+
+    private function handleRequestException(RequestException $ex)
+    {
+        if ($ex->hasResponse()) {
+            $response = $ex->getResponse();
+
+            $reason = $response->getReasonPhrase();
+            $code = $response->getStatusCode();
+            $data = $response->json();
+
+            $msg = $data['error']['msg'];
+
+            throw new \Exception("Solr error HTTP $code $reason:  $msg", 0, $ex);
+        }
+
+        throw new \Exception("Solr query failed", 0, $ex);
     }
 }

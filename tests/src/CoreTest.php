@@ -18,9 +18,16 @@ namespace Opendi\Solr\Client\Tests;
 
 use Mockery as m;
 
+use GuzzleHttp\Subscriber\Mock;
+use GuzzleHttp\Message\Response;
+
 use Opendi\Solr\Client\Client;
 use Opendi\Solr\Client\Select;
+use Opendi\Solr\Client\Solr;
 use Opendi\Solr\Client\Update;
+use Opendi\Solr\Client\Core;
+
+use Opendi\Lang\Json;
 
 class CoreTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,59 +38,253 @@ class CoreTest extends \PHPUnit_Framework_TestCase
 
     public function testSelect()
     {
-        $baseUrl = "http://localhost:8983/solr/";
+        $select = Solr::select()->search('name:frank zappa');
+        $query = $select->render();
 
-        // Mock request objects
-        $request = m::mock('GuzzleHttp\\Message\\Request');
-        $request->shouldReceive('getBody')
+        $coreName = "foo";
+        $path = "$coreName/select?$query";
+        $expected = "123";
+
+        $mockResponse = m::mock(Response::class);
+        $mockResponse->shouldReceive('getBody')
             ->once()
-            ->andReturn("Mock response body.");
+            ->andReturn($expected);
 
-        // Mock Guzzle client
-        $guzzle = m::mock('GuzzleHttp\\Client');
-        $guzzle->shouldReceive('getBaseUrl')
+        $mockClient = m::mock(Client::class);
+        $mockClient->shouldReceive('get')
             ->once()
-            ->andReturn($baseUrl);
+            ->with($path)
+            ->andReturn($mockResponse);
 
-        $guzzle->shouldReceive('get')
-            ->with("entries/select?q=" . urlencode("name:frank zappa"))
-            ->once()
-            ->andReturn($request);
+        $core = new Core($mockClient, $coreName);
+        $actual = $core->select($select);
 
-        $select = new Select();
-        $select->search('name:frank zappa');
-
-        $client = new Client($guzzle);
-        $core = $client->core('entries');
-        $core->select($select);
+        $this->assertSame($expected, $actual);
     }
 
     public function testUpdate()
     {
-        $baseUrl = "http://localhost:8983/solr/entries/";
+        $coreName = "foo";
         $body = '{ "id": 1 }';
+        $update = Solr::update()->body($body)->commit(true);
+        $query = $update->render();
+        $path = "$coreName/update?$query";
+        $expected = "123";
 
-        // Mock request and response objects
-        $request = m::mock('GuzzleHttp\\Message\\Request');
-        $request->shouldReceive('getBody')
+        $options = [
+            'body' => $body,
+            'headers' => ['Content-Type' => 'application/json']
+        ];
+
+        $mockResponse = m::mock(Response::class);
+        $mockResponse->shouldReceive('getBody')
             ->once()
-            ->andReturn("Mock response body.");
+            ->andReturn($expected);
 
-        // Mock Guzzle client
-        $guzzle = m::mock('GuzzleHttp\\Client');
-        $guzzle->shouldReceive('getBaseUrl')
+        $mockClient = m::mock(Client::class);
+        $mockClient->shouldReceive('post')
             ->once()
-            ->andReturn($baseUrl);
+            ->with($path, $options)
+            ->andReturn($mockResponse);
 
-        $guzzle->shouldReceive('post')
-            ->with("entries/update?", ['body' => $body, 'headers'=> ['Content-Type' => 'application/json']])
+        $core = new Core($mockClient, $coreName);
+        $actual = $core->update($update);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testStatus()
+    {
+        $coreName = "foo";
+        $count = 123;
+        $coreStatus = ['foo' => 'bar'];
+
+        $status = [
+            'status' => [
+                $coreName => $coreStatus
+            ]
+        ];
+
+        $mockResponse = m::mock(Response::class);
+        $mockResponse->shouldReceive('json')
             ->once()
-            ->andReturn($request);
+            ->andReturn($status);
 
-        $update = new Update();
-        $update->body($body);
+        $mockClient = m::mock(Client::class);
+        $mockClient->shouldReceive('get')
+            ->once()
+            ->with("admin/cores", ['action' => 'STATUS', 'core' => 'foo', 'wt' => 'json'])
+            ->andReturn($mockResponse);
 
-        $client = new Client($guzzle);
-        $client->core('entries')->update($update);
+        $core = new Core($mockClient, $coreName);
+        $actual = $core->status();
+
+        $this->assertSame($coreStatus, $actual);
+    }
+
+    public function testCount()
+    {
+        $core = "foo";
+        $count = 123;
+
+        $response = Json::encode([
+            'response' => [
+                'numFound' => $count
+            ]
+        ]);
+
+        $coreName = "foo";
+        $path = "$coreName/select?q=" . urlencode("*:*") . "&wt=json&rows=0";
+        $expected = "123";
+
+        $mockResponse = m::mock(Response::class);
+        $mockResponse->shouldReceive('getBody')
+            ->once()
+            ->andReturn($response);
+
+        $mockClient = m::mock(Client::class);
+        $mockClient->shouldReceive('get')
+            ->once()
+            ->with($path)
+            ->andReturn($mockResponse);
+
+        $core = new Core($mockClient, $coreName);
+        $actual = $core->count();
+
+        $this->assertSame($actual, $count);
+    }
+
+    public function testDeleteAll()
+    {
+        $retval = 123;
+        $coreName = "xxx";
+
+        $path = "$coreName/update";
+        $query = [
+            'commit' => 'true',
+            'wt' => 'json',
+        ];
+        $body = '{"delete":{"query":"*:*"}}';
+        $headers = ['Content-Type' => 'application/json'];
+
+        $mockResponse = m::mock(Response::class);
+        $mockResponse->shouldReceive('json')
+            ->once()
+            ->andReturn($retval);
+
+        $mockClient = m::mock(Client::class);
+        $mockClient->shouldReceive('post')
+            ->once()
+            ->with($path, $query, $body, $headers)
+            ->andReturn($mockResponse);
+
+        $core = new Core($mockClient, $coreName);
+
+        $actual = $core->deleteAll();
+
+        $this->assertSame($retval, $actual);
+    }
+
+    public function testDeleteByQuery()
+    {
+        $retval = 123;
+        $coreName = "xxx";
+        $select = "name:ivan";
+
+        $path = "$coreName/update";
+        $query = ['commit' => 'true', 'wt' => 'json'];
+        $body = json_encode(["delete" => ["query" => $select]]);
+        $headers = ['Content-Type' => 'application/json'];
+
+        $mockResponse = m::mock(Response::class);
+        $mockResponse->shouldReceive('json')
+            ->once()
+            ->andReturn($retval);
+
+        $mockClient = m::mock(Client::class);
+        $mockClient->shouldReceive('post')
+            ->once()
+            ->with($path, $query, $body, $headers)
+            ->andReturn($mockResponse);
+
+        $core = new Core($mockClient, $coreName);
+
+        $actual = $core->deleteByQuery($select);
+
+        $this->assertSame($retval, $actual);
+    }
+
+    public function testDeleteByID()
+    {
+        $id = 666;
+        $retval = 123;
+        $coreName = "xxx";
+        $select = "name:ivan";
+
+        $path = "$coreName/update";
+        $query = ['commit' => 'true', 'wt' => 'json'];
+        $body = json_encode(["delete" => ["id" => $id]]);
+        $headers = ['Content-Type' => 'application/json'];
+
+        $mockResponse = m::mock(Response::class);
+        $mockResponse->shouldReceive('json')
+            ->once()
+            ->andReturn($retval);
+
+        $mockClient = m::mock(Client::class);
+        $mockClient->shouldReceive('post')
+            ->once()
+            ->with($path, $query, $body, $headers)
+            ->andReturn($mockResponse);
+
+        $core = new Core($mockClient, $coreName);
+
+        $actual = $core->deleteByID($id);
+
+        $this->assertSame($retval, $actual);
+    }
+
+    public function testPing()
+    {
+        $coreName = "xyz";
+        $expected = "expected response";
+
+        $response = m::mock(Response::class);
+        $response->shouldReceive('json')
+            ->andReturn($expected);
+
+        $client = m::mock(Client::class);
+        $client->shouldReceive('get')
+            ->with("$coreName/admin/ping", ["wt" => "json"])
+            ->once()
+            ->andReturn($response);
+
+        $core = new Core($client, $coreName);
+        $actual = $core->ping();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testPingCustomHandler()
+    {
+        $coreName = "xyz";
+        $expected = "expected response";
+        $handler = "foo/bar";
+
+        $response = m::mock(Response::class);
+        $response->shouldReceive('json')
+            ->andReturn($expected);
+
+        $client = m::mock(Client::class);
+        $client->shouldReceive('get')
+            ->with("$coreName/$handler", ["wt" => "json"])
+            ->once()
+            ->andReturn($response);
+
+        $core = new Core($client, $coreName);
+        $core->setPingHandler($handler);
+        $actual = $core->ping();
+
+        $this->assertSame($expected, $actual);
     }
 }

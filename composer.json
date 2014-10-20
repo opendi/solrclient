@@ -2,6 +2,7 @@
     "name": "opendi/solrclient",
     "type": "library",
     "description": "Client for Apache Solr",
+    "version": "0.4.0",
     "keywords": ["solr"],
     "homepage": "https://github.com/opendi/solrclient",
     "license": "Apache-2.0",
@@ -16,8 +17,11 @@
     "require": {
         "php": ">=5.4.0",
         "guzzlehttp/guzzle": "4.*",
-        "pimple/pimple": "~3.0",
-        "symfony/config": "2.4.*"
+        "opendi/lang": "~0.3.3",
+        "pimple/pimple": "3.0.*",
+        "symfony/config": "~2.5.4",
+        "symfony/console": "~2.5.4",
+        "symfony/finder": "~2.5.4"
     },
     "require-dev": {
         "mockery/mockery": "*"
