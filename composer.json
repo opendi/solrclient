@@ -34,5 +34,8 @@
         "psr-4": {
             "Opendi\\Solr\\Client\\Tests\\": "tests/src/"
         }
-    }
+    },
+    "bin": [
+        "bin/solr"
+    ]
 }
