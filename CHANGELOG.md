@@ -1,16 +1,23 @@
 Opendi Solr Client Changelog
 ============================
 
-0.3.3 (TBA)
------------
+0.4.1 (2014-10-22)
+------------------
 
+* Added bin/solr binary to composer.json so that it will be available to
+  libraries which use solrclient.
+
+0.4.0 (2014-10-20)
+------------------
+
+* Added `Group` class for better sorting
+* Added `Solr:group()`
 * Added `Core::count()`
 * Added `Core::deleteAll()`
 * Added `Core::deleteByID()`
 * Added `Core::deleteByQuery()`
 * Added `Core::status()`
 * Added `Client::factory()` for easier client construction
-
 * Moved `Client::ping()` to `Core::ping()`
 * Modified the ping command to take a core name as argument
 
