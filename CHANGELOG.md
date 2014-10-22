@@ -1,11 +1,17 @@
 Opendi Solr Client Changelog
 ============================
 
+0.4.2 (2014-10-22)
+------------------
+
+* Fixed a bug in `bin/solr` which prevented autoloading (#8) when installed as
+  a dependency.
+
 0.4.1 (2014-10-22)
 ------------------
 
 * Added bin/solr binary to composer.json so that it will be available to
-  libraries which use solrclient.
+  libraries which use solrclient (#7)
 
 0.4.0 (2014-10-20)
 ------------------
