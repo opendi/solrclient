@@ -1,9 +1,16 @@
 #!/usr/bin/env php
 <?php
 
-$autoload = __DIR__ . '/../vendor/autoload.php';
-if (file_exists($autoload)) {
-    include $autoload;
+$autoload = [
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../../autoload.php',
+];
+
+foreach ($autoload as $file) {
+    if (file_exists($file)) {
+        include $file;
+        break;
+    }
 }
 
 use Opendi\Solr\Client\Console\SolrApplication;
