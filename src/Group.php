@@ -16,27 +16,20 @@
  */
 namespace Opendi\Solr\Client;
 
-class Group
+/**
+ * Grouping query.
+ *
+ * @see
+ */
+class Group extends Query
 {
     const FORMAT_GROUPED = 'grouped';
     const FORMAT_SIMPLE = 'simple';
 
-    /**
-     * Holds the query separated into an array of two-value arrays.
-     *
-     * For example:
-     * ```
-     * $this->query = [
-     *     ['field' => 'place'],
-     *     ['limit' => 100]
-     * ]
-     * ```
-     *
-     * When rendered, this will become: `field=place&limit=100`.
-     *
-     * @var array
-     */
-    private $query = [];
+    public function __construct()
+    {
+        $this->add('group', 'true');
+    }
 
     /**
      * Identifies a field to be treated as a group.
@@ -49,7 +42,7 @@ class Group
      */
     public function field($field)
     {
-        return $this->param('group.field', $field);
+        return $this->add('group.field', $field);
     }
 
     /**
@@ -61,7 +54,7 @@ class Group
      */
     public function groupSort($sort)
     {
-        return $this->param('group.sort', $sort);
+        return $this->add('group.sort', $sort);
     }
 
     /**
@@ -75,7 +68,7 @@ class Group
      */
     public function sort($sort)
     {
-        return $this->param('sort', $sort);
+        return $this->add('sort', $sort);
     }
 
     /**
@@ -87,7 +80,7 @@ class Group
      */
     public function limit($limit)
     {
-        return $this->param('group.limit', $limit);
+        return $this->add('group.limit', $limit);
     }
 
     /**
@@ -99,7 +92,7 @@ class Group
      */
     public function offset($offset)
     {
-        return $this->param('group.offset', $offset);
+        return $this->add('group.offset', $offset);
     }
 
     /**
@@ -118,7 +111,7 @@ class Group
         if (!in_array($format,[self::FORMAT_GROUPED, self::FORMAT_SIMPLE])) {
             throw new SolrException("Invalid group format");
         }
-        return $this->param('group.format', $format);
+        return $this->add('group.format', $format);
     }
 
     /**
@@ -129,8 +122,8 @@ class Group
      */
     public function main()
     {
-        $this->param('group.format', self::FORMAT_SIMPLE);
-        return $this->param('group.main', 'true');
+        $this->add('group.format', self::FORMAT_SIMPLE);
+        return $this->add('group.main', 'true');
     }
 
     /**
@@ -147,7 +140,7 @@ class Group
      */
     public function ngroups()
     {
-        return $this->param('group.ngroups', 'true');
+        return $this->add('group.ngroups', 'true');
     }
 
     /**
@@ -163,7 +156,7 @@ class Group
      */
     public function truncate()
     {
-        return $this->param('group.truncate', 'true');
+        return $this->add('group.truncate', 'true');
     }
 
     /**
@@ -186,7 +179,7 @@ class Group
      */
     public function facet()
     {
-        return $this->param('group.facet', 'true');
+        return $this->add('group.facet', 'true');
     }
 
     /**
@@ -203,43 +196,6 @@ class Group
      */
     public function cache($number)
     {
-        return $this->param('group.cache.percent', $number);
-    }
-
-    /**
-     * Generic setter for query parameters.
-     *
-     * @param string $name
-     * @param string $value
-     * @param string $field
-     * @return $this
-     */
-    private function param($name, $value, $field = null)
-    {
-        // Apply the parameter to a specific field
-        if (!empty($field)) {
-            $name = "$field.$name";
-        }
-
-        $this->query[] = [$name, $value];
-
-        return $this;
-    }
-
-    /**
-     * Converts the facet to a http encoded query.
-     */
-    public function render()
-    {
-        $query = [
-            'group=true'
-        ];
-
-        foreach ($this->query as $item) {
-            list($name, $value) = $item;
-            $query[] = implode("=", [$name, urlencode($value)]);
-        }
-
-        return implode("&", $query);
+        return $this->add('group.cache.percent', $number);
     }
 }
