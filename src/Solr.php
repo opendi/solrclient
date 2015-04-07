@@ -18,6 +18,11 @@ namespace Opendi\Solr\Client;
 
 use GuzzleHttp\Client as Guzzle;
 
+use Opendi\Solr\Client\Query\Facet;
+use Opendi\Solr\Client\Query\Group;
+use Opendi\Solr\Client\Query\Select;
+use Opendi\Solr\Client\Query\Update;
+
 /**
  * Helper factory class for instantiating new Solr components.
  *
@@ -34,11 +39,6 @@ class Solr
     public static function facet()
     {
         return new Facet();
-    }
-
-    public static function filter()
-    {
-        return new Filter();
     }
 
     public static function select()

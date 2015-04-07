@@ -124,7 +124,6 @@ class CoreTest extends \PHPUnit_Framework_TestCase
 
     public function testCount()
     {
-        $core = "foo";
         $count = 123;
 
         $response = Json::encode([
@@ -134,7 +133,7 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $coreName = "foo";
-        $path = "$coreName/select?q=" . urlencode("*:*") . "&wt=json&rows=0";
+        $path = "$coreName/select?q=" . urlencode("*:*") . "&rows=0&wt=json";
         $expected = "123";
 
         $mockResponse = m::mock(Response::class);

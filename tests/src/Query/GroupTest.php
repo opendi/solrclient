@@ -14,9 +14,9 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client\Tests;
+namespace Opendi\Solr\Client\Tests\Query;
 
-use Opendi\Solr\Client\Group;
+use Opendi\Solr\Client\Query\Group;
 use Opendi\Solr\Client\Solr;
 
 class GroupTest extends \PHPUnit_Framework_TestCase
@@ -42,7 +42,7 @@ class GroupTest extends \PHPUnit_Framework_TestCase
 
     public function testSort()
     {
-        $actual = Solr::group()->field('foo')->groupSort('foo desc')->render();
+        $actual = Solr::group()->field('foo')->sort('foo desc')->render();
         $expected = "group=true&group.field=foo&group.sort=foo+desc";
         $this->assertSame($expected, $actual);
     }

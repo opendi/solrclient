@@ -14,17 +14,21 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client\Parsers;
+namespace Opendi\Solr\Client\Tests\Query;
 
-// TODO rest of supported fields
-class DismaxParser implements ParserInterface
+use Opendi\Solr\Client\Query\EDisMaxSelect;
+
+class EDisMaxSelectTest extends \PHPUnit_Framework_TestCase
 {
-    private $type = 'dismax';
-
-    public function render()
+    public function testDismaxBasic()
     {
-        $result = 'defType=' . $this->type;
+        $boost = "foo";
 
-        return $result;
-    }
+        $select = new EDisMaxSelect();
+        $select->boost($boost);
+
+        $expected = "defType=edismax&boost=$boost";
+        $actual = $select->render();
+
+        $this->assertSame($expected, $actual);    }
 }

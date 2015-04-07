@@ -14,7 +14,10 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client;
+namespace Opendi\Solr\Client\Query;
+
+use Opendi\Solr\Client\Query;
+use Opendi\Solr\Client\SolrException;
 
 /**
  * Grouping query.
@@ -52,23 +55,9 @@ class Group extends Query
      * @param  string $sort Sort value.
      * @return Group
      */
-    public function groupSort($sort)
-    {
-        return $this->add('group.sort', $sort);
-    }
-
-    /**
-     * How to sort the groups relative to each other.
-     * For example, sort=popularity desc will cause the groups
-     * to be sorted according to the highest popularity doc in each group.
-     * Defaults to "score desc".
-     *
-     * @param  string $sort Sort value.
-     * @return Group
-     */
     public function sort($sort)
     {
-        return $this->add('sort', $sort);
+        return $this->add('group.sort', $sort);
     }
 
     /**

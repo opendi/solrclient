@@ -20,6 +20,8 @@ use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\Exception\RequestException;
 
 use Opendi\Lang\Json;
+use Opendi\Solr\Client\Query\Select;
+use Opendi\Solr\Client\Query\Update;
 
 /**
  * Functionality which can be invoked on a Solr core.
