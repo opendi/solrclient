@@ -14,9 +14,9 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client\Tests;
+namespace Opendi\Solr\Client\Tests\Query;
 
-use Opendi\Solr\Client\Facet;
+use Opendi\Solr\Client\Query\Facet;
 use Opendi\Solr\Client\Solr;
 
 class FacetTest extends \PHPUnit_Framework_TestCase

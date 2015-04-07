@@ -1,6 +1,15 @@
 Opendi Solr Client Changelog
 ============================
 
+1.0.0 (TBA)
+-----------
+
+* Reorganized code sructure
+* Queries moved to `Query` subnamespace
+* Removed `Parser` classes, replaced by Select subclasses
+* Removed `Filter` classes, replaced by `Select::filter()`
+* Removed `Expression`, to be reimplemented
+
 0.4.2 (2014-10-22)
 ------------------
 

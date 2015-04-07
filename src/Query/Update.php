@@ -14,9 +14,30 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client\Parsers;
+namespace Opendi\Solr\Client\Query;
 
-interface ParserInterface
+use Opendi\Solr\Client\Query;
+
+class Update extends Query
 {
-    public function render();
+    private $body;
+
+    public function commit()
+    {
+        $this->add('commit', 'true');
+
+        return $this;
+    }
+
+    public function body($body)
+    {
+        $this->body = $body;
+
+        return $this;
+    }
+
+    public function getBody()
+    {
+        return $this->body;
+    }
 }

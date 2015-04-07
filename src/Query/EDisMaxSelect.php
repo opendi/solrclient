@@ -14,20 +14,31 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client\Tests;
+namespace Opendi\Solr\Client\Query;
 
-use Opendi\Solr\Client\Update;
-use Opendi\Solr\Client\Solr;
-
-class UpdateTest extends \PHPUnit_Framework_TestCase
+/**
+ * A query for the DisMax query parser.
+ *
+ * @see https://cwiki.apache.org/confluence/display/solr/The+Extended+DisMax+Query+Parser
+ */
+class EDisMaxSelect extends DisMaxSelect
 {
-    public function testFactory()
-    {
-        $update1 = Solr::update();
-        $update2 = Solr::update();
+    protected $defType = "edismax";
 
-        $this->assertNotSame($update1, $update2);
-        $this->assertInstanceOf(Update::class, $update1);
-        $this->assertInstanceOf(Update::class, $update2);
+    /**
+     * Add a boost multiplier.
+     *
+     * Strings are parsed as queries with scores multiplied by the score from
+     * the main query for all matching documents.
+     *
+     * @param  string $query The boost query
+     *
+     * @return EdisMaxSelect
+     */
+    public function boost($query)
+    {
+        $this->add("boost", $query);
+
+        return $this;
     }
 }

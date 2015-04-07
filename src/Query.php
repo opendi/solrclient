@@ -32,8 +32,8 @@ class Query
      * For example:
      * ```
      * $this->query = [
-     *     ['field' => 'place'],
-     *     ['limit' => 100]
+     *     ['field', 'place'],
+     *     ['limit', 100]
      * ]
      * ```
      *
@@ -48,28 +48,39 @@ class Query
      *
      * @param string $key
      * @param string $value
+     * @param array $locals
      */
-    public function add($key, $value)
+    public function add($key, $value, array $locals = null)
     {
+        if (!empty($locals)) {
+            $locals = $this->renderLocals($locals);
+            $value = $locals . $value;
+        }
+
         $this->query[] = [$key, $value];
 
         return $this;
     }
 
-    /**
-     * Builds a query string matching the query.
-     *
-     * @return string
-     */
-    public function render()
+    protected function renderLocals(array $locals)
     {
-        $mapper = function($item) {
-            return http_build_query([$item[0] => $item[1]]);
-        };
+        $values = [];
 
-        $query = array_map($mapper, $this->query);
+        foreach ($locals as $key => $value) {
+            if (is_bool($value)) {
+                $value = $value ? "true" : "false";
+            }
 
-        return implode('&', $query);
+            if (is_numeric($key)) {
+                $values[] = $value;
+            } else {
+                $values[] = "$key=$value";
+            }
+        }
+
+        $values = implode(" ", $values);
+
+        return "{!$values}";
     }
 
     /**
@@ -80,9 +91,12 @@ class Query
     public function merge(Query $query)
     {
         $pairs = $query->getAll();
+
         foreach ($pairs as $pair) {
             $this->query[] = $pair;
         }
+
+        return $this;
     }
 
     /**
@@ -98,5 +112,44 @@ class Query
     public function __toString()
     {
         return $this->render();
+    }
+
+    /**
+     * Builds a query string from data in $this->query.
+     *
+     * @return string
+     */
+    public function render()
+    {
+        return $this->renderPairs($this->query);
+    }
+
+    /**
+     * Takes an array of pairs and renders a query string.
+     *
+     * @param  array  $pairs
+     *
+     * @return string
+     */
+    protected function renderPairs(array $pairs, $glue = '&')
+    {
+        $query = array_map([$this, 'joinPair'], $pairs);
+
+        return implode($glue, $query);
+    }
+
+    /**
+     * Takes an array with two elements, urlencodes them and joins them with an
+     * equals sign.
+     *
+     * @param  array  $pair
+     *
+     * @return string
+     */
+    protected function joinPair(array $pair)
+    {
+        return http_build_query([
+            $pair[0] => $pair[1]]
+        );
     }
 }
