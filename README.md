@@ -3,6 +3,8 @@ solrclient
 
 Classes for the busy PHP developer to work with Apache Solr.
 
+[ ![Codeship Status for opendi/solrclient](https://codeship.com/projects/d48f8a90-4e5a-0132-5b16-220cbe717b80/status)](https://codeship.com/projects/47655)
+
 Construction
 ------------
 

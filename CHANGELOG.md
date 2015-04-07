@@ -1,6 +1,11 @@
 Opendi Solr Client Changelog
 ============================
 
+0.5.0 (2015-04-07)
+------------------
+
+* Updated dependencies to Symfony components 2.6 and Guzzle 5
+
 0.4.2 (2014-10-22)
 ------------------
 
