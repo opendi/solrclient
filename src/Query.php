@@ -139,8 +139,8 @@ class Query
     }
 
     /**
-     * Takes an array with two elements, urlencodes them and joins them with an
-     * equals sign.
+     * Takes an array with two elements, converts them to strings, urlencodes
+     * them and joins them with an equals sign.
      *
      * @param  array  $pair
      *
@@ -148,8 +148,9 @@ class Query
      */
     protected function joinPair(array $pair)
     {
-        return http_build_query([
-            $pair[0] => $pair[1]]
-        );
+        $pair = array_map('strval', $pair);
+        $pair = array_map('urlencode', $pair);
+
+        return implode("=", $pair);
     }
 }
