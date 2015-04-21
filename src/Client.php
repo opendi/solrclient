@@ -18,6 +18,10 @@ namespace Opendi\Solr\Client;
 
 use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\Message\RequestInterface;
+use GuzzleHttp\Message\Response;
+use GuzzleHttp\Exception\RequestException;
+
+use Opendi\Solr\Client\SolrException;
 
 use InvalidArgumentException;
 
@@ -154,16 +158,42 @@ class Client
     {
         if ($ex->hasResponse()) {
             $response = $ex->getResponse();
-
-            $reason = $response->getReasonPhrase();
             $code = $response->getStatusCode();
-            $data = $response->json();
+            $reason = $response->getReasonPhrase();
 
-            $msg = $data['error']['msg'];
-
-            throw new \Exception("Solr error HTTP $code $reason:  $msg", 0, $ex);
+            $msg = $this->getResponseErrorMessage($response);
+            if ($msg !== null) {
+                throw new SolrException("Solr returned HTTP $code $reason: $msg", 0, $ex);
+            } else {
+                throw new SolrException("Solr returned HTTP $code $reason", 0, $ex);
+            }
         }
 
-        throw new \Exception("Solr query failed", 0, $ex);
+        throw new SolrException("Solr query failed", 0, $ex);
+    }
+
+    private function getResponseErrorMessage(Response $response)
+    {
+        // Try to get the SOLR error message from the response body
+        $contentType = $response->getHeader("Content-Type");
+
+        // If response contains XML
+        if (strpos($contentType, 'application/xml') !== false) {
+            $msgs = $response->xml()->xpath('lst[@name="error"]/str[@name="msg"]');
+            if (!empty($msgs)) {
+                return strval($msgs[0]);
+            }
+        }
+
+        // If response contains JSON
+        if (strpos($contentType, 'application/json') !== false) {
+            $data = $response->json();
+            if (isset($data['error']['msg'])) {
+                return $data['error']['msg'];
+            }
+        }
+
+        // Message not found
+        return null;
     }
 }
