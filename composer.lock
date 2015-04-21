@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c4f20e1b7c30369d7f6d9cca9762fcc4",
+    "hash": "e28467dfc053c07cae14990a823c59ef",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -66,16 +66,16 @@
         },
         {
             "name": "guzzlehttp/ringphp",
-            "version": "1.0.7",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/RingPHP.git",
-                "reference": "52d868f13570a9a56e5fce6614e0ec75d0f13ac2"
+                "reference": "dbbb91d7f6c191e5e405e900e3102ac7f261bc0b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/RingPHP/zipball/52d868f13570a9a56e5fce6614e0ec75d0f13ac2",
-                "reference": "52d868f13570a9a56e5fce6614e0ec75d0f13ac2",
+                "url": "https://api.github.com/repos/guzzle/RingPHP/zipball/dbbb91d7f6c191e5e405e900e3102ac7f261bc0b",
+                "reference": "dbbb91d7f6c191e5e405e900e3102ac7f261bc0b",
                 "shasum": ""
             },
             "require": {
@@ -93,7 +93,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0-dev"
+                    "dev-master": "1.1-dev"
                 }
             },
             "autoload": {
@@ -113,7 +113,7 @@
                 }
             ],
             "description": "Provides a simple API and specification that abstracts away the details of HTTP into a single PHP function.",
-            "time": "2015-03-30 01:43:20"
+            "time": "2015-05-20 03:37:09"
         },
         {
             "name": "guzzlehttp/streams",
@@ -167,16 +167,16 @@
         },
         {
             "name": "opendi/lang",
-            "version": "0.3.5",
+            "version": "0.3.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/opendi/lang.git",
-                "reference": "f7d5b4c4e382b1bf69e1db4e5b431f2ad13b298a"
+                "reference": "02077432744f04ab4df4262f2458d017c1311162"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/opendi/lang/zipball/f7d5b4c4e382b1bf69e1db4e5b431f2ad13b298a",
-                "reference": "f7d5b4c4e382b1bf69e1db4e5b431f2ad13b298a",
+                "url": "https://api.github.com/repos/opendi/lang/zipball/02077432744f04ab4df4262f2458d017c1311162",
+                "reference": "02077432744f04ab4df4262f2458d017c1311162",
                 "shasum": ""
             },
             "require": {
@@ -203,19 +203,19 @@
                 "date",
                 "lang"
             ],
-            "time": "2015-02-02 14:25:05"
+            "time": "2015-05-08 15:03:55"
         },
         {
             "name": "pimple/pimple",
             "version": "v3.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/fabpot/Pimple.git",
+                "url": "https://github.com/silexphp/Pimple.git",
                 "reference": "876bf0899d01feacd2a2e83f04641e51350099ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fabpot/Pimple/zipball/876bf0899d01feacd2a2e83f04641e51350099ef",
+                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/876bf0899d01feacd2a2e83f04641e51350099ef",
                 "reference": "876bf0899d01feacd2a2e83f04641e51350099ef",
                 "shasum": ""
             },
@@ -253,16 +253,16 @@
         },
         {
             "name": "react/promise",
-            "version": "v2.2.0",
+            "version": "v2.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/promise.git",
-                "reference": "365fcee430dfa4ace1fbc75737ca60ceea7eeeef"
+                "reference": "3b6fca09c7d56321057fa8867c8dbe1abf648627"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise/zipball/365fcee430dfa4ace1fbc75737ca60ceea7eeeef",
-                "reference": "365fcee430dfa4ace1fbc75737ca60ceea7eeeef",
+                "url": "https://api.github.com/repos/reactphp/promise/zipball/3b6fca09c7d56321057fa8867c8dbe1abf648627",
+                "reference": "3b6fca09c7d56321057fa8867c8dbe1abf648627",
                 "shasum": ""
             },
             "require": {
@@ -289,25 +289,25 @@
             "authors": [
                 {
                     "name": "Jan Sorgalla",
-                    "email": "jsorgalla@googlemail.com"
+                    "email": "jsorgalla@gmail.com"
                 }
             ],
             "description": "A lightweight implementation of CommonJS Promises/A for PHP",
-            "time": "2014-12-30 13:32:42"
+            "time": "2015-07-03 13:48:55"
         },
         {
             "name": "symfony/config",
-            "version": "v2.6.6",
+            "version": "v2.6.10",
             "target-dir": "Symfony/Component/Config",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Config.git",
-                "reference": "d91be01336605db8da21b79bc771e46a7276d1bc"
+                "reference": "b5063937fab6fdfb7bacc00bc8c0cd7ee0c50070"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Config/zipball/d91be01336605db8da21b79bc771e46a7276d1bc",
-                "reference": "d91be01336605db8da21b79bc771e46a7276d1bc",
+                "url": "https://api.github.com/repos/symfony/Config/zipball/b5063937fab6fdfb7bacc00bc8c0cd7ee0c50070",
+                "reference": "b5063937fab6fdfb7bacc00bc8c0cd7ee0c50070",
                 "shasum": ""
             },
             "require": {
@@ -334,31 +334,31 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony Config Component",
-            "homepage": "http://symfony.com",
-            "time": "2015-03-30 15:54:10"
+            "homepage": "https://symfony.com",
+            "time": "2015-07-08 05:59:48"
         },
         {
             "name": "symfony/console",
-            "version": "v2.6.6",
+            "version": "v2.6.10",
             "target-dir": "Symfony/Component/Console",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Console.git",
-                "reference": "5b91dc4ed5eb08553f57f6df04c4730a73992667"
+                "reference": "042107bc202845086739414339e551fbe81293d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Console/zipball/5b91dc4ed5eb08553f57f6df04c4730a73992667",
-                "reference": "5b91dc4ed5eb08553f57f6df04c4730a73992667",
+                "url": "https://api.github.com/repos/symfony/Console/zipball/042107bc202845086739414339e551fbe81293d7",
+                "reference": "042107bc202845086739414339e551fbe81293d7",
                 "shasum": ""
             },
             "require": {
@@ -392,35 +392,34 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony Console Component",
-            "homepage": "http://symfony.com",
-            "time": "2015-03-30 15:54:10"
+            "homepage": "https://symfony.com",
+            "time": "2015-07-13 09:09:47"
         },
         {
             "name": "symfony/filesystem",
-            "version": "v2.6.6",
-            "target-dir": "Symfony/Component/Filesystem",
+            "version": "v2.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Filesystem.git",
-                "reference": "4983964b3693e4f13449cb3800c64a9112c301b4"
+                "reference": "2d7b2ddaf3f548f4292df49a99d19c853d43f0b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Filesystem/zipball/4983964b3693e4f13449cb3800c64a9112c301b4",
-                "reference": "4983964b3693e4f13449cb3800c64a9112c301b4",
+                "url": "https://api.github.com/repos/symfony/Filesystem/zipball/2d7b2ddaf3f548f4292df49a99d19c853d43f0b8",
+                "reference": "2d7b2ddaf3f548f4292df49a99d19c853d43f0b8",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": ">=5.3.9"
             },
             "require-dev": {
                 "symfony/phpunit-bridge": "~2.7"
@@ -428,11 +427,11 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.6-dev"
+                    "dev-master": "2.7-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
+                "psr-4": {
                     "Symfony\\Component\\Filesystem\\": ""
                 }
             },
@@ -442,31 +441,31 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony Filesystem Component",
-            "homepage": "http://symfony.com",
-            "time": "2015-03-22 16:55:57"
+            "homepage": "https://symfony.com",
+            "time": "2015-07-09 16:07:40"
         },
         {
             "name": "symfony/finder",
-            "version": "v2.6.6",
+            "version": "v2.6.10",
             "target-dir": "Symfony/Component/Finder",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Finder.git",
-                "reference": "5dbe2e73a580618f5b4880fda93406eed25de251"
+                "reference": "203a10f928ae30176deeba33512999233181dd28"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Finder/zipball/5dbe2e73a580618f5b4880fda93406eed25de251",
-                "reference": "5dbe2e73a580618f5b4880fda93406eed25de251",
+                "url": "https://api.github.com/repos/symfony/Finder/zipball/203a10f928ae30176deeba33512999233181dd28",
+                "reference": "203a10f928ae30176deeba33512999233181dd28",
                 "shasum": ""
             },
             "require": {
@@ -492,32 +491,32 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony Finder Component",
-            "homepage": "http://symfony.com",
-            "time": "2015-03-30 15:54:10"
+            "homepage": "https://symfony.com",
+            "time": "2015-07-09 16:02:48"
         }
     ],
     "packages-dev": [
         {
             "name": "hamcrest/hamcrest-php",
-            "version": "v1.2.1",
+            "version": "v1.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hamcrest/hamcrest-php.git",
-                "reference": "ac50c470531243944f977b8de75be0b684a9cb51"
+                "reference": "b37020aa976fa52d3de9aa904aa2522dc518f79c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hamcrest/hamcrest-php/zipball/ac50c470531243944f977b8de75be0b684a9cb51",
-                "reference": "ac50c470531243944f977b8de75be0b684a9cb51",
+                "url": "https://api.github.com/repos/hamcrest/hamcrest-php/zipball/b37020aa976fa52d3de9aa904aa2522dc518f79c",
+                "reference": "b37020aa976fa52d3de9aa904aa2522dc518f79c",
                 "shasum": ""
             },
             "require": {
@@ -549,7 +548,7 @@
             "keywords": [
                 "test"
             ],
-            "time": "2015-01-20 19:34:09"
+            "time": "2015-05-11 14:41:42"
         },
         {
             "name": "mockery/mockery",
