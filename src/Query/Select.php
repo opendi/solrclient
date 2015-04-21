@@ -262,7 +262,7 @@ class Select extends Query
     /**
      * {@inheritdoc}
      */
-    public function getQuery()
+    public function getPairs()
     {
         $query = $this->query;
 
