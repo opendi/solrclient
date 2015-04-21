@@ -90,7 +90,7 @@ class Query
      */
     public function merge(Query $query)
     {
-        $pairs = $query->getAll();
+        $pairs = $query->getPairs();
 
         foreach ($pairs as $pair) {
             $this->query[] = $pair;
@@ -104,7 +104,7 @@ class Query
      *
      * @return array
      */
-    public function getQuery()
+    public function getPairs()
     {
         return $this->query;
     }
@@ -121,7 +121,7 @@ class Query
      */
     public function render()
     {
-        return $this->renderPairs($this->getQuery());
+        return $this->renderPairs($this->getPairs());
     }
 
     /**
@@ -131,7 +131,7 @@ class Query
      */
     public function dump()
     {
-        $pairs = $this->getQuery();
+        $pairs = $this->getPairs();
 
         $render = function ($pair) {
             return implode("=", array_map('strval', $pair));
