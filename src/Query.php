@@ -125,6 +125,22 @@ class Query
     }
 
     /**
+     * Returns a user-readable representation of the query.
+     *
+     * @return string
+     */
+    public function dump()
+    {
+        $pairs = $this->getQuery();
+
+        $render = function ($pair) {
+            return implode("=", array_map('strval', $pair));
+        };
+
+        return implode("\n", array_map($render, $pairs));
+    }
+
+    /**
      * Takes an array of pairs and renders a query string.
      *
      * @param  array  $pairs
