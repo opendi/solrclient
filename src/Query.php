@@ -104,7 +104,7 @@ class Query
      *
      * @return array
      */
-    public function getAll()
+    public function getQuery()
     {
         return $this->query;
     }
@@ -121,7 +121,7 @@ class Query
      */
     public function render()
     {
-        return $this->renderPairs($this->query);
+        return $this->renderPairs($this->getQuery());
     }
 
     /**

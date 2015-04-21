@@ -262,15 +262,15 @@ class Select extends Query
     /**
      * {@inheritdoc}
      */
-    public function render()
+    public function getQuery()
     {
         $query = $this->query;
 
-        // Add the query parser to the query, if sepcified
+        // Add the query parser to the query, if specified
         if (isset($this->defType)) {
             array_unshift($query, ['defType', $this->defType]);
         }
 
-        return $this->renderPairs($query);
+        return $query;
     }
 }
