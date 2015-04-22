@@ -53,25 +53,37 @@ class Core
 
     public function select(Select $select)
     {
-        $query = $select->render();
-        $url = "$this->name/select?$query";
+        $path = $this->selectPath($select);
 
-        $response = $this->client->get($url);
+        $response = $this->client->get($path);
 
         return (string) $response->getBody(true);
     }
 
+    public function selectPath(Select $select)
+    {
+        $query = $select->render();
+
+        return "$this->name/select?$query";
+    }
+
     public function update(Update $update)
     {
-        $query = $update->render();
-        $url = "$this->name/update?$query";
+        $path = $this->updatePath($update);
 
-        $response = $this->client->post($url, [
+        $response = $this->client->post($path, [
             'body' => $update->getBody(),
             'headers' => ['Content-Type' => 'application/json']
         ]);
 
         return (string) $response->getBody(true);
+    }
+
+    public function updatePath(Update $update)
+    {
+        $query = $update->render();
+
+        return "$this->name/update?$query";
     }
 
     /**
