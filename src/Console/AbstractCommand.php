@@ -95,58 +95,10 @@ abstract class AbstractCommand extends Command
         // Construct and return the client
         $guzzle = new GuzzleClient($options);
 
-        $this->setupRequestLogging($guzzle, $output);
+        // Setup logging and progress bars
+        $subscriber = new OutputSubscriber($output);
+        $guzzle->getEmitter()->attach($subscriber);
 
         return new Client($guzzle);
-    }
-
-    private function setupRequestLogging(GuzzleClient $guzzle, $output)
-    {
-        $emitter = $guzzle->getEmitter();
-
-        //  Show the method and URL before each request
-        $emitter->on('before', function (BeforeEvent $e) use ($output) {
-            $url = $e->getRequest()->getUrl();
-            $method = $e->getRequest()->getMethod();
-
-            $output->write(sprintf("<info>%s</info> %s ", $method, $url));
-        });
-
-        // Show status code after the request
-        $emitter->on('headers', function (HeadersEvent $e) use ($output) {
-            $code = $e->getResponse()->getStatusCode();
-            $reason = $e->getResponse()->getReasonPhrase();
-
-            if ($code < 300) {
-                $msg = "<info>$code $reason</info>";
-            } else {
-                $msg = "<error>$code $reason</error>";
-            }
-
-            $output->writeln($msg);
-        });
-
-        // On error, display the Solr error message from the response if
-        // possible
-        $emitter->on('error', function (ErrorEvent $e) use ($output) {
-            $response = $e->getResponse();
-
-            if ($response !== null) {
-                // If there is a response, try to parse it to get the Solr error
-                try {
-                    $data = $response->json();
-
-                    if (isset($data['error']['msg'])) {
-                        $error = "Solr error: " . $data['error']['msg'];
-
-                        $output-> writeln("");
-                        $output-> writeln("<error>$error</error>");
-                        return;
-                    }
-                } catch (ParseException $e) {
-                    // Cannot parse :(
-                }
-            }
-        });
     }
 }

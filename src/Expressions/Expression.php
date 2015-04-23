@@ -73,7 +73,6 @@ class Expression
         return $this;
     }
 
-
     /**
      * Sets an array of local parameters.
      *
