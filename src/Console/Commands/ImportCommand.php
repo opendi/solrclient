@@ -2,6 +2,9 @@
 
 namespace Opendi\Solr\Client\Console\Commands;
 
+use GuzzleHttp\Event\ProgressEvent;
+
+use Opendi\Solr\Client\Client;
 use Opendi\Solr\Client\Console\AbstractCommand;
 
 use Symfony\Component\Console\Command\Command;
@@ -33,7 +36,7 @@ class ImportCommand extends AbstractCommand
             )
             ->addArgument(
                 'source',
-                InputArgument::REQUIRED,
+                InputArgument::IS_ARRAY,
                 'Path to a file or folder to import from (recursively).'
             );
     }
@@ -41,32 +44,34 @@ class ImportCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $core = $input->getArgument('core');
-        $source = $input->getArgument('source');
+        $sources = $input->getArgument('source');
 
         $client = $this->getClient($input, $output);
 
         $output->writeln("Collection: <info>$core</info>");
         $output->writeln("--");
 
-        if (!file_exists($source)) {
-            throw new \Exception("Source not found: $source");
-        }
-
-        if (is_dir($source)) {
-            $finder = new Finder();
-            $finder->files()->in($source)->sortByName();
-
-            foreach ($finder as $file) {
-                $this->importFile($client, $core, $file, $output);
+        foreach ($sources as $source) {
+            if (!file_exists($source)) {
+                throw new \Exception("Source not found: $source");
             }
-        } else {
-            $this->importFile($client, $core, $source, $output);
+
+            if (is_dir($source)) {
+                $finder = new Finder();
+                $finder->files()->in($source)->sortByName();
+
+                foreach ($finder as $file) {
+                    $this->importFile($client, $core, $file, $output);
+                }
+            } else {
+                $this->importFile($client, $core, $source, $output);
+            }
         }
 
         $output->writeln("<info>Done.</info>");
     }
 
-    private function importFile($client, $core, $source, $output)
+    private function importFile(Client $client, $core, $source, $output)
     {
         $output->writeln("Importing data from: <info>$source</info>");
 
@@ -89,6 +94,6 @@ class ImportCommand extends AbstractCommand
         }
 
         $time = $reply['responseHeader']['QTime'];
-        $output->writeln("Time taken: <info>$time ms</info>\n");
+        $output->writeln("Time taken: <comment>$time ms</comment>\n");
     }
 }
