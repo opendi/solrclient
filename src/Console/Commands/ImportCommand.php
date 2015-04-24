@@ -7,6 +7,8 @@ use GuzzleHttp\Event\ProgressEvent;
 use Opendi\Solr\Client\Client;
 use Opendi\Solr\Client\Console\AbstractCommand;
 
+use SplFileInfo;
+
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
@@ -64,19 +66,20 @@ class ImportCommand extends AbstractCommand
                     $this->importFile($client, $core, $file, $output);
                 }
             } else {
-                $this->importFile($client, $core, $source, $output);
+                $file = new SplFileInfo($source);
+                $this->importFile($client, $core, $file, $output);
             }
         }
 
         $output->writeln("<info>Done.</info>");
     }
 
-    private function importFile(Client $client, $core, $source, $output)
+    private function importFile(Client $client, $core, SplFileInfo $source, $output)
     {
         $output->writeln("Importing data from: <info>$source</info>");
 
         $path = "$core/update";
-        $body = fopen($source, 'r');
+        $fp = fopen($source, 'r');
 
         $query = [
             'commit' => 'true',
@@ -87,7 +90,7 @@ class ImportCommand extends AbstractCommand
             'Content-Type' => 'application/json'
         ];
 
-        $reply = $client->post($path, $query, $body, $headers)->json();
+        $reply = $client->post($path, $query, $fp, $headers)->json();
 
         if ($reply['responseHeader']['status'] != 0) {
             throw new \Exception("Solr returned an error.");
