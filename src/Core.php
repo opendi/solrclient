@@ -206,6 +206,22 @@ class Core
         return $response->json();
     }
 
+    public function optimize()
+    {
+        $path = "$this->name/update";
+
+        $query = [
+            'optimize' => 'true',
+            'wt' => 'json'
+        ];
+
+        $headers = [
+            'Content-Type' => 'application/json'
+        ];
+
+        return $this->client->post($path, $query, $headers)->json();
+    }
+
     /**
      * Sets the path to the Solr ping handler.
      *
