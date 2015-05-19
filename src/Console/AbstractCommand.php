@@ -63,6 +63,11 @@ abstract class AbstractCommand extends Command
             );
     }
 
+    /**
+     * Constructs a Solr client from input params.
+     *
+     * @return Client
+     */
     protected function getClient(InputInterface $input, OutputInterface $output)
     {
         if (isset($this->client)) {
@@ -83,8 +88,6 @@ abstract class AbstractCommand extends Command
         if (!empty($username)) {
             $output->writeln("Basic auth: <info>$username</info>");
         }
-
-        $output->writeln("");
 
         // Guzzle options
         $options = ['base_url' => $baseURL];

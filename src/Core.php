@@ -113,12 +113,14 @@ class Core
     /**
      * Returns the number of records in the core.
      *
+     * @param  string $query If given, will count documents matching the query.
+     *
      * @return integer
      */
-    public function count()
+    public function count($query = "*:*")
     {
         $select = Solr::select()
-            ->search('*:*')
+            ->search($query)
             ->rows(0)
             ->format('json');
 
