@@ -222,6 +222,22 @@ class Core
         return $this->client->post($path, $query, $headers)->json();
     }
 
+    public function commit()
+    {
+        $path = "$this->name/update";
+
+        $query = [
+            'commit' => 'true',
+            'wt' => 'json'
+        ];
+
+        $headers = [
+            'Content-Type' => 'application/json'
+        ];
+
+        return $this->client->post($path, $query, $headers)->json();
+    }
+
     /**
      * Sets the path to the Solr ping handler.
      *
