@@ -80,6 +80,28 @@ class Client
     }
 
     /**
+     * Returns core status info.
+     *
+     * @param string $core Name of the core to return the status for, or null
+     *                     to return status for all cores.
+     */
+    public function status($core = null)
+    {
+        $path = "admin/cores";
+
+        $query = [
+            "action" => "STATUS",
+            "wt" => "json"
+        ];
+
+        if (isset($core)) {
+            $query['core'] = $core;
+        }
+
+        return $this->get($path, $query)->json();
+    }
+
+    /**
      * Returns the underlying Guzzle client's event emitter.
      *
      * @return GuzzleHttp\Event\EmitterInterface
