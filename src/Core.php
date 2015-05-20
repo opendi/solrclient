@@ -18,6 +18,7 @@ namespace Opendi\Solr\Client;
 
 use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Message\Response;
 
 use Opendi\Lang\Json;
 use Opendi\Solr\Client\Query\Select;
@@ -67,16 +68,47 @@ class Core
         return "$this->name/select?$query";
     }
 
+    /**
+     * Performs an update query.
+     *
+     * Forces wt=json and decodes the response.
+     *
+     * @param  Update $updat
+     *
+     * @return array
+     */
     public function update(Update $update)
+    {
+        // Force resulting data to be json-encoded
+        $update->format('json');
+
+        $response = $this->updateRaw($update);
+
+        return $response->json();
+    }
+
+    /**
+     * Performs an Update query and returns the raw response.
+     *
+     * Unlike update(), does not force wt=json.
+     *
+     * @param  Update $update
+     *
+     * @return Response
+     */
+    public function updateRaw(Update $update)
     {
         $path = $this->updatePath($update);
 
-        $response = $this->client->post($path, [
-            'body' => $update->getBody(),
-            'headers' => ['Content-Type' => 'application/json']
-        ]);
+        $body = $update->getBody();
+        $contentType = $update->getContentType();
 
-        return (string) $response->getBody(true);
+        $headers = [];
+        if (isset($contentType)) {
+            $headers['Content-Type'] = $contentType;
+        }
+
+        return $this->client->post($path, [], $body, $headers);
     }
 
     public function updatePath(Update $update)

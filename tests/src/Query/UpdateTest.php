@@ -30,4 +30,30 @@ class UpdateTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Update::class, $update1);
         $this->assertInstanceOf(Update::class, $update2);
     }
+
+    public function testQueryParams1()
+    {
+        $update = new Update();
+        $update->commit();
+        $update->optimize();
+        $update->overwrite();
+        $update->commitWithin(10);
+
+        $expected = "commit=true&optimize=true&overwrite=true&commitWithin=10";
+        $actual = $update->render();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testBody()
+    {
+        $body = "foo";
+        $ct = "bar";
+
+        $update = new Update();
+        $update->body($body)->contentType($ct);
+
+        $this->assertSame($body, $update->getBody());
+        $this->assertSame($ct, $update->getContentType());
+    }
 }
