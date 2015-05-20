@@ -174,26 +174,17 @@ class Core
      */
     public function deleteByID($id, $commit = true)
     {
-        $core = $this->name;
-
-        $path = "$core/update";
-
-        $query = [
-            "commit" => $commit ? "true" : "false",
-            "wt" => "json"
-        ];
-
-        $headers = [
-            'Content-Type' => 'application/json'
-        ];
-
         $body = Json::encode([
             "delete" => [
                 "id" => $id
             ]
         ]);
 
-        return $this->client->post($path, $query, $body, $headers)->json();
+        $update = Solr::update()
+            ->body($body)
+            ->commit($commit);
+
+        return $this->update($update);
     }
 
     /**
@@ -201,26 +192,17 @@ class Core
      */
     public function deleteByQuery($select, $commit = true)
     {
-        $core = $this->name;
-
-        $path = "$core/update";
-
-        $query = [
-            "commit" => $commit ? "true" : "false",
-            "wt" => "json"
-        ];
-
-        $headers = [
-            'Content-Type' => 'application/json'
-        ];
-
         $body = Json::encode([
             "delete" => [
                 "query" => $select
             ]
         ]);
 
-        return $this->client->post($path, $query, $body, $headers)->json();
+        $update = Solr::update()
+            ->body($body)
+            ->commit($commit);
+
+        return $this->update($update);
     }
 
     /**
@@ -240,36 +222,33 @@ class Core
         return $response->json();
     }
 
+    /**
+     * Optimizes the data in the core.
+     *
+     * @return array Decoded response from the Solr server.
+     */
     public function optimize()
     {
-        $path = "$this->name/update";
+        $update = new Update();
+        $update->optimize();
 
-        $query = [
-            'optimize' => 'true',
-            'wt' => 'json'
-        ];
-
-        $headers = [
-            'Content-Type' => 'application/json'
-        ];
-
-        return $this->client->post($path, $query, $headers)->json();
+        return $this->update($update);
     }
 
+    /**
+     * Commits the data in the core.
+     *
+     * This will make all data which was sent previously, but not commited,
+     * available for search.
+     *
+     * @return array Decoded response from the Solr server.
+     */
     public function commit()
     {
-        $path = "$this->name/update";
+        $update = new Update();
+        $update->commit();
 
-        $query = [
-            'commit' => 'true',
-            'wt' => 'json'
-        ];
-
-        $headers = [
-            'Content-Type' => 'application/json'
-        ];
-
-        return $this->client->post($path, $query, $headers)->json();
+        return $this->update($update);
     }
 
     /**
