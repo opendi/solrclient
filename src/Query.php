@@ -164,6 +164,11 @@ class Query
      */
     protected function joinPair(array $pair)
     {
+        // Handle boolean values
+        if (is_bool($pair[1])) {
+            $pair[1] = $pair[1] ? 'true' : 'false';
+        }
+
         $pair = array_map('strval', $pair);
         $pair = array_map('urlencode', $pair);
 

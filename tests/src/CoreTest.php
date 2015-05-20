@@ -66,29 +66,59 @@ class CoreTest extends \PHPUnit_Framework_TestCase
     {
         $coreName = "foo";
         $body = '{ "id": 1 }';
-        $update = Solr::update()->body($body)->commit(true);
-        $query = $update->render();
-        $path = "$coreName/update?$query";
-        $expected = "123";
+        $contentType = 'application/json';
 
-        $options = [
-            'body' => $body,
-            'headers' => ['Content-Type' => 'application/json']
-        ];
+        $update = Solr::update()
+            ->body($body)
+            ->contentType($contentType)
+            ->commit();
+
+        $query = $update->render();
+        $path = "$coreName/update?$query&wt=json";
+        $expected = "123";
+        $headers = ['Content-Type' => 'application/json'];
 
         $mockResponse = m::mock(Response::class);
-        $mockResponse->shouldReceive('getBody')
+        $mockResponse->shouldReceive('json')
             ->once()
             ->andReturn($expected);
 
         $mockClient = m::mock(Client::class);
         $mockClient->shouldReceive('post')
             ->once()
-            ->with($path, $options)
+            ->with($path, [], $body, $headers)
             ->andReturn($mockResponse);
 
         $core = new Core($mockClient, $coreName);
         $actual = $core->update($update);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testUpdateRaw()
+    {
+        $coreName = "foo";
+        $body = '{ "id": 1 }';
+        $contentType = 'application/json';
+
+        $update = Solr::update()
+            ->body($body)
+            ->contentType($contentType)
+            ->commit();
+
+        $query = $update->render();
+        $path = "$coreName/update?$query";
+        $expected = new \stdClass();
+        $headers = ['Content-Type' => 'application/json'];
+
+        $mockClient = m::mock(Client::class);
+        $mockClient->shouldReceive('post')
+            ->once()
+            ->with($path, [], $body, $headers)
+            ->andReturn($expected);
+
+        $core = new Core($mockClient, $coreName);
+        $actual = $core->updateRaw($update);
 
         $this->assertSame($expected, $actual);
     }

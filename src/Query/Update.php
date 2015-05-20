@@ -22,13 +22,101 @@ class Update extends Query
 {
     private $body;
 
-    public function commit()
+    private $contentType = 'application/json';
+
+    const CONTENT_TYPE_JSON = 'application/json';
+    const CONTENT_TYPE_XML = 'application/xml';
+
+    // -- Query elements -------------------------------------------------------
+
+    /**
+     * Issues a commit after the data has been ingested.
+     *
+     * @param boolean $commit
+     *
+     * @return Update
+     */
+    public function commit($commit = true)
     {
-        $this->add('commit', 'true');
+        $this->add('commit', $commit);
 
         return $this;
     }
 
+    /**
+     * Optimize the core after data has been ingested. May take some time.
+     *
+     * @param boolean $optimize
+     *
+     * @return Update
+     */
+    public function optimize($optimize = true)
+    {
+        $this->add('optimize', $optimize);
+
+        return $this;
+    }
+
+    /**
+     * If true (the default), check for and overwrite duplicate documents, based
+     * on the uniqueKey field declared in the Solr schema.
+     *
+     * If you know the documents you are indexing do not contain any duplicates
+     * then you may see a considerable speed up setting this to false.
+     *
+     * WARNING: Setting overwrite to FALSE disables checking for duplicates and
+     * will cause duplicates to be inserted into the index.
+     *
+     * @param boolean $overwrite
+     *
+     * @return Update
+     */
+    public function overwrite($overwrite = true)
+    {
+        $this->add('overwrite', $overwrite);
+
+        return $this;
+    }
+
+    /**
+     * Add the document within the specified number of milliseconds.
+     *
+     * @param  integer $commitWithin
+     *
+     * @return Update
+     */
+    public function commitWithin($commitWithin)
+    {
+        $this->add('commitWithin', $commitWithin);
+
+        return $this;
+    }
+
+    /**
+     * Specifies the Response Writer to be used to format the query response.
+     *
+     * @see https://cwiki.apache.org/confluence/display/solr/Response+Writers
+     *
+     * @param  string $format The response writer to use.
+     *
+     * @return Select
+     */
+    public function format($format)
+    {
+        $this->add('wt', $format);
+
+        return $this;
+    }
+
+    // -- Accessors ------------------------------------------------------------
+
+    /**
+     * Sets the body.
+     *
+     * @param  mixed $body Body contents or stream.
+     *
+     * @return Update
+     */
     public function body($body)
     {
         $this->body = $body;
@@ -36,8 +124,37 @@ class Update extends Query
         return $this;
     }
 
+    /**
+     * Returns the update message body.
+     *
+     * @return mixed Body contents or stream.
+     */
     public function getBody()
     {
         return $this->body;
+    }
+
+    /**
+     * Sets the update content type used in the header.
+     *
+     * @param  string $contentType
+     *
+     * @return Update
+     */
+    public function contentType($contentType)
+    {
+        $this->contentType = $contentType;
+
+        return $this;
+    }
+
+    /**
+     * Returns the content type header value.
+     *
+     * @return string
+     */
+    public function getContentType()
+    {
+        return $this->contentType;
     }
 }
