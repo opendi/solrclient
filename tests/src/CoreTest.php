@@ -152,6 +152,37 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($coreStatus, $actual);
     }
 
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage Core "foo" does not exist.
+     */
+    public function testStatusNonexistantCore()
+    {
+        $coreName = "foo";
+        $count = 123;
+        $coreStatus = ['foo' => 'bar'];
+
+        $status = [
+            'status' => []
+        ];
+
+        $mockResponse = m::mock(Response::class);
+        $mockResponse->shouldReceive('json')
+            ->once()
+            ->andReturn($status);
+
+        $mockClient = m::mock(Client::class);
+        $mockClient->shouldReceive('get')
+            ->once()
+            ->with("admin/cores", ['action' => 'STATUS', 'core' => 'foo', 'wt' => 'json'])
+            ->andReturn($mockResponse);
+
+        $core = new Core($mockClient, $coreName);
+        $actual = $core->status();
+
+        $this->assertSame($coreStatus, $actual);
+    }
+
     public function testCount()
     {
         $count = 123;

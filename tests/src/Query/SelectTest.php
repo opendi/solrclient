@@ -32,6 +32,23 @@ class SelectTest extends \PHPUnit_Framework_TestCase
         $select = new Select();
         $select->search('(opendi OR test)', 'name');
         $this->assertEquals('q=' . urlencode('name:(opendi OR test)'), $select->render());
+
+        $this->assertEquals($select->render(), $select->__toString());
+    }
+
+    public function testDump()
+    {
+        $select = new Select();
+        $select->indent()->rows(20)->search('opendi', 'name');
+        $actual = $select->dump();
+
+        $expected = implode("\n", [
+            "indent=true",
+            "rows=20",
+            "q=name:opendi",
+        ]);
+
+        $this->assertSame($expected, $actual);
     }
 
     public function testIndent()

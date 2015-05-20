@@ -21,6 +21,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Message\Response;
 
 use Opendi\Lang\Json;
+use Opendi\Solr\Client\Client;
 use Opendi\Solr\Client\Query\Select;
 use Opendi\Solr\Client\Query\Update;
 
@@ -32,7 +33,7 @@ class Core
     /**
      * The Solr Client, used for making requests.
      *
-     * @var Opendi\Solr\Client\Client
+     * @var Client
      */
     private $client;
 
@@ -264,5 +265,25 @@ class Core
     public function setPingHandler($handler)
     {
         $this->pingHandler = $handler;
+    }
+
+    /**
+     * Returns the core name.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Returns the underlying Solr client.
+     *
+     * @return Client
+     */
+    public function getClient()
+    {
+        return $this->client;
     }
 }
