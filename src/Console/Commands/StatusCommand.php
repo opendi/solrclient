@@ -21,8 +21,8 @@ class StatusCommand extends AbstractCommand
             ->setDescription("Displays core status info.")
             ->addArgument(
                 'core',
-                InputArgument::REQUIRED,
-                'Name of the core.'
+                InputArgument::OPTIONAL,
+                'Name of the core, if not given will display status for all cores.'
             );
     }
 
@@ -30,8 +30,16 @@ class StatusCommand extends AbstractCommand
     {
         $core = $input->getArgument('core');
         $client = $this->getClient($input, $output);
-        $status = $client->core($core)->status();
 
+        $data = $client->status($core);
+
+        foreach($data['status'] as $name => $status) {
+            $this->witeCoreStatus($output, $status);
+        }
+    }
+
+    protected function witeCoreStatus(OutputInterface $output, $status)
+    {
         $lastModified = new \DateTime($status['index']['lastModified']);
         $startTime = new \DateTime($status['startTime']);
         $upTime = $startTime->diff(new \DateTime());
