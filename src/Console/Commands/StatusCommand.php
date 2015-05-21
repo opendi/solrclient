@@ -48,7 +48,7 @@ class StatusCommand extends AbstractCommand
 
         $data = $client->status($core);
 
-        foreach($data['status'] as $name => $status) {
+        foreach ($data['status'] as $name => $status) {
             $this->witeCoreStatus($output, $status);
         }
     }
