@@ -97,7 +97,7 @@ class Group extends Query
      */
     public function format($format)
     {
-        if (!in_array($format,[self::FORMAT_GROUPED, self::FORMAT_SIMPLE])) {
+        if (!in_array($format, [self::FORMAT_GROUPED, self::FORMAT_SIMPLE])) {
             throw new SolrException("Invalid group format");
         }
         return $this->add('group.format', $format);

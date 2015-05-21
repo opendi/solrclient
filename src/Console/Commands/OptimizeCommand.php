@@ -52,9 +52,9 @@ class OptimizeCommand extends AbstractCommand
         $time = $result['responseHeader']['QTime'];
 
         if ($time >= 1000) {
-        	$time = number_format($time / 1000, 2) . " s";
+            $time = number_format($time / 1000, 2) . " s";
         } else {
-        	$time .= " ms";
+            $time .= " ms";
         }
 
         $output->writeln("Done.");

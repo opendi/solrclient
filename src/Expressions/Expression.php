@@ -93,7 +93,7 @@ class Expression
     public function render()
     {
         // Render any sub-terms to strings
-        $renderer = function($item) {
+        $renderer = function ($item) {
             if ($item instanceof Expression) {
                 return "(" . $item->render() . ")";
             }
