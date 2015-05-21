@@ -22,7 +22,7 @@ use Opendi\Solr\Client\SolrException;
 /**
  * Grouping query.
  *
- * @see
+ * @see https://cwiki.apache.org/confluence/display/solr/Result+Grouping
  */
 class Group extends Query
 {
