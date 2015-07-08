@@ -49,7 +49,11 @@ class StatusCommand extends AbstractCommand
         $data = $client->status($core);
 
         foreach ($data['status'] as $name => $status) {
-            $this->witeCoreStatus($output, $status);
+            if (!empty($status)) {
+                $this->witeCoreStatus($output, $status);
+            } else {
+                $output->writeln("<error>Core $name does not exist</error>");
+            }
         }
     }
 
