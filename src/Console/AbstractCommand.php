@@ -20,10 +20,9 @@ namespace Opendi\Solr\Client\Console;
 use Opendi\Solr\Client\Client;
 
 use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Event\BeforeEvent;
-use GuzzleHttp\Event\ErrorEvent;
-use GuzzleHttp\Event\HeadersEvent;
-use GuzzleHttp\Exception\ParseException;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -104,18 +103,28 @@ abstract class AbstractCommand extends Command
             $output->writeln("Basic auth: <info>$username</info>");
         }
 
+        // Middleware which logs requests
+        $before = function (Request $request, $options) use ($output) {
+            $url = $request->getUri();
+            $method = $request->getMethod();
+            $output->writeln(sprintf("<info>%s</info> %s ", $method, $url));
+        };
+
+        // Setup the default handler stack and add the logging middleware
+        $stack = HandlerStack::create();
+        $stack->push(Middleware::tap($before));
+
         // Guzzle options
-        $options = ['base_url' => $baseURL];
+        $options = [
+            'base_uri' => $baseURL,
+            'handler' => $stack
+        ];
+
         if (isset($username)) {
-            $options['defaults']['auth'] = [$username, $password];
+            $options['auth'] = [$username, $password];
         }
 
-        // Construct and return the client
         $guzzle = new GuzzleClient($options);
-
-        // Setup logging and progress bars
-        $subscriber = new OutputSubscriber($output);
-        $guzzle->getEmitter()->attach($subscriber);
 
         return new Client($guzzle);
     }

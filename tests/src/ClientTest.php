@@ -19,8 +19,8 @@ namespace Opendi\Solr\Client\Tests;
 use Mockery as m;
 
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Message\Request;
-use GuzzleHttp\Message\Response;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 
 use Opendi\Solr\Client\Client;
 use Opendi\Solr\Client\Core;
@@ -44,24 +44,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $guzzle = $client->getGuzzleClient();
 
-        $this->assertSame($url, $guzzle->getBaseURL());
-        $this->assertSame($timeout, $guzzle->getDefaultOption('timeout'));
+        $this->assertSame($url, strval($guzzle->getConfig('base_uri')));
+        $this->assertSame($timeout, $guzzle->getConfig('timeout'));
     }
-
-    /**
-     * @expectedException Opendi\Solr\Client\SolrException
-     * @expectedExceptionMessage You need to set a base_url on Guzzle client.
-     */
-    public function testFailureNoBasUrl()
-    {
-        $guzzle = m::mock('GuzzleHttp\\Client');
-        $guzzle->shouldReceive('getBaseUrl')
-            ->once()
-            ->andReturn(null);
-
-        $select = new Client($guzzle);
-    }
-
 
     /**
      * @expectedException InvalidArgumentException
@@ -71,21 +56,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $client = $this->getTestClient();
         $client->core([]);
-    }
-
-    public function testGetEmitter()
-    {
-        $client = $this->getTestClient();
-        $expected = new \stdClass();
-
-        $guzzle = $client->getGuzzleClient();
-        $guzzle->shouldReceive('getEmitter')
-            ->once()
-            ->andReturn($expected);
-
-        $actual = $client->getEmitter();
-
-        $this->assertSame($expected, $actual);
     }
 
     public function testCoreFactory()
@@ -111,67 +81,74 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     private function getTestClient()
     {
         $guzzle = m::mock('GuzzleHttp\\Client');
-        $guzzle->shouldReceive('getBaseUrl')
-            ->once()
-            ->andReturn('http://localhost:8983/solr/');
 
         return new Client($guzzle);
     }
 
+    public function testGetRequest()
+    {
+        $uri = 'mrm?foo=bar';
+        $headers = ['xxx' => 'yyy'];
+        $expectedHeaders = ['xxx' => ['yyy']];
+
+        $client = $this->getTestClient();
+        $request = $client->formGetRequest($uri, $headers);
+
+        $this->assertInstanceOf(Request::class, $request);
+        $this->assertSame("GET", $request->getMethod());
+        $this->assertSame($uri, strval($request->getUri()));
+        $this->assertSame($expectedHeaders, $request->getHeaders());
+    }
+
     public function testGet()
     {
-        $query = ['foo' => 'bar'];
-        $path = 'mrm';
-
-        $options = ['query' => $query];
-
         $client = $this->getTestClient();
         $guzzle = $client->getGuzzleClient();
 
-        $mockRequest = m::mock(Request::class);
-        $mockResponse = m::mock(Response::class);
-
-        $guzzle->shouldReceive('createRequest')
-            ->once()
-            ->with('GET', $path, $options)
-            ->andReturn($mockRequest);
+        $response = m::mock(Response::class);
 
         $guzzle->shouldReceive('send')
             ->once()
-            ->andReturn($mockResponse);
+            ->with(m::type(Request::class))
+            ->andReturn($response);
 
-        $response = $client->get($path, $query);
+        $response = $client->get("foo");
 
-        $this->assertSame($response, $mockResponse);
+        $this->assertSame($response, $response);
+    }
+
+    public function testPostRequest()
+    {
+        $uri = 'mrm?foo=bar';
+        $headers = ['xxx' => 'yyy'];
+        $expectedHeaders = ['xxx' => ['yyy']];
+        $body = 'idonteven';
+
+        $client = $this->getTestClient();
+        $request = $client->formPostRequest($uri, $body, $headers);
+
+        $this->assertInstanceOf(Request::class, $request);
+        $this->assertSame("POST", $request->getMethod());
+        $this->assertSame($uri, strval($request->getUri()));
+        $this->assertSame($expectedHeaders, $request->getHeaders());
+        $this->assertSame($body, $request->getBody()->getContents());
     }
 
     public function testPost()
     {
-        $path = 'mrm';
-        $query = ['foo' => 'bar'];
-        $body = 'idonteven';
-        $headers = ['bla' => 'tra'];
-
-        $options = compact('query', 'body', 'headers');
-
         $client = $this->getTestClient();
         $guzzle = $client->getGuzzleClient();
 
-        $mockRequest = m::mock(Request::class);
-        $mockResponse = m::mock(Response::class);
-
-        $guzzle->shouldReceive('createRequest')
-            ->once()
-            ->with('POST', $path, $options)
-            ->andReturn($mockRequest);
+        $response = m::mock(Response::class);
 
         $guzzle->shouldReceive('send')
             ->once()
-            ->andReturn($mockResponse);
+            ->with(m::type(Request::class))
+            ->andReturn($response);
 
-        $response = $client->post($path, $query, $body, $headers);
+        $response = $client->post("foo");
 
-        $this->assertSame($response, $mockResponse);
+        $this->assertSame($response, $response);
     }
 
     /**

@@ -19,6 +19,8 @@ namespace Opendi\Solr\Client\Console\Commands;
 
 use GuzzleHttp\Event\ProgressEvent;
 
+use Opendi\Lang\Json;
+
 use Opendi\Solr\Client\Client;
 use Opendi\Solr\Client\Console\AbstractCommand;
 
@@ -93,25 +95,26 @@ class ImportCommand extends AbstractCommand
     {
         $output->writeln("Importing data from: <info>$source</info>");
 
-        $path = "$core/update";
         $fp = fopen($source, 'r');
 
-        $query = [
+        $path = "$core/update?" . http_build_query([
             'commit' => 'true',
             'wt' => 'json'
-        ];
+        ]);
 
         $headers = [
             'Content-Type' => 'application/json'
         ];
 
-        $reply = $client->post($path, $query, $fp, $headers)->json();
+        $response = $client->post($path, $fp, $headers);
+        $contents = $response->getBody()->getContents();
+        $reply = Json::decode($contents);;
 
-        if ($reply['responseHeader']['status'] != 0) {
+        if ($reply->responseHeader->status != 0) {
             throw new \Exception("Solr returned an error.");
         }
 
-        $time = $reply['responseHeader']['QTime'];
+        $time = $reply->responseHeader->QTime;
         $output->writeln("Time taken: <comment>$time ms</comment>\n");
     }
 }

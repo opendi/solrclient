@@ -28,13 +28,13 @@ class SolrClientServiceProvider implements ServiceProviderInterface
     public function __construct($settings)
     {
         $defaultSettings = [
-            'base_url' => null,
+            'base_uri' => null,
         ];
 
         $this->settings = array_merge($defaultSettings, $settings);
 
-        if (empty($this->settings['base_url'])) {
-            throw new \Exception("You must give a base_url for the solr provider.");
+        if (empty($this->settings['base_uri'])) {
+            throw new \Exception("You must give a base_uri for the solr provider.");
         }
     }
 
@@ -42,7 +42,7 @@ class SolrClientServiceProvider implements ServiceProviderInterface
     {
         $container['solr'] = function () {
             $guzzle = new GuzzleClient([
-                'base_url' => $this->settings['base_url']
+                'base_uri' => $this->settings['base_uri']
             ]);
 
             return new SolrClient($guzzle);

@@ -28,7 +28,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
         $container = new \Pimple\Container();
 
         $provider = new SolrClientServiceProvider([
-            'base_url' => $url
+            'base_uri' => $url
         ]);
 
         $container->register($provider);
@@ -36,12 +36,14 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
         $client = $container['solr'];
 
         $this->assertInstanceOf(Client::class, $client);
-        $this->assertSame($url, $client->getGuzzleClient()->getBaseUrl());
+
+        $actual = (string) $client->getGuzzleClient()->getConfig('base_uri');
+        $this->assertSame($url, $actual);
     }
 
     /**
      * @expectedException Exception
-     * @expectedExceptionMessage You must give a base_url for the solr provider
+     * @expectedExceptionMessage You must give a base_uri for the solr provider
      */
     public function testNoBaseUrl()
     {

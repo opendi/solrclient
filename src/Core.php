@@ -84,8 +84,8 @@ class Core
         $update->format('json');
 
         $response = $this->updateRaw($update);
-
-        return $response->json();
+        $contents = $response->getBody()->getContents();
+        return Json::decode($contents, true);
     }
 
     /**
@@ -109,7 +109,7 @@ class Core
             $headers['Content-Type'] = $contentType;
         }
 
-        return $this->client->post($path, [], $body, $headers);
+        return $this->client->post($path, $body, $headers);
     }
 
     public function updatePath(Update $update)
@@ -127,14 +127,18 @@ class Core
     public function status()
     {
         $core = $this->name;
-        $path = "admin/cores";
-        $query = [
+
+        $query = http_build_query([
             "action" => "STATUS",
             "core" => $core,
             "wt" => "json"
-        ];
+        ]);
 
-        $data = $this->client->get($path, $query)->json();
+        $path = "admin/cores?$query";
+
+        $response = $this->client->get($path);
+        $contents = $response->getBody()->getContents();
+        $data = Json::decode($contents, true);
 
         if (empty($data['status'][$core])) {
             throw new \Exception("Core \"$core\" does not exist.");
@@ -209,18 +213,16 @@ class Core
     /**
      * Pings the server to check it's there.
      *
-     * @return array Solr's reply.
-     * @throws SolrException If server does not respond.
+     * @return array Decoded response from the Solr server.
      */
     public function ping()
     {
         $path = implode('/', [$this->name, $this->pingHandler]);
+        $path = "$path?wt=json";
 
-        $response = $this->client->get($path, [
-            'wt' => 'json'
-        ]);
-
-        return $response->json();
+        $response = $this->client->get($path);
+        $contents = $response->getBody()->getContents();
+        return Json::decode($contents, true);
     }
 
     /**

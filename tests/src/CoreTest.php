@@ -75,24 +75,24 @@ class CoreTest extends \PHPUnit_Framework_TestCase
 
         $query = $update->render();
         $path = "$coreName/update?$query&wt=json";
-        $expected = "123";
+        $expected = "[1,2,3]";
         $headers = ['Content-Type' => 'application/json'];
 
         $mockResponse = m::mock(Response::class);
-        $mockResponse->shouldReceive('json')
+        $mockResponse->shouldReceive('getBody->getContents')
             ->once()
             ->andReturn($expected);
 
         $mockClient = m::mock(Client::class);
         $mockClient->shouldReceive('post')
             ->once()
-            ->with($path, [], $body, $headers)
+            ->with($path, $body, $headers)
             ->andReturn($mockResponse);
 
         $core = new Core($mockClient, $coreName);
         $actual = $core->update($update);
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame(json_decode($expected), $actual);
     }
 
     public function testUpdateRaw()
@@ -114,7 +114,7 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $mockClient = m::mock(Client::class);
         $mockClient->shouldReceive('post')
             ->once()
-            ->with($path, [], $body, $headers)
+            ->with($path, $body, $headers)
             ->andReturn($expected);
 
         $core = new Core($mockClient, $coreName);
@@ -129,21 +129,21 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $count = 123;
         $coreStatus = ['foo' => 'bar'];
 
-        $status = [
+        $status = Json::encode([
             'status' => [
                 $coreName => $coreStatus
             ]
-        ];
+        ]);
 
         $mockResponse = m::mock(Response::class);
-        $mockResponse->shouldReceive('json')
+        $mockResponse->shouldReceive('getBody->getContents')
             ->once()
             ->andReturn($status);
 
         $mockClient = m::mock(Client::class);
         $mockClient->shouldReceive('get')
             ->once()
-            ->with("admin/cores", ['action' => 'STATUS', 'core' => 'foo', 'wt' => 'json'])
+            ->with("admin/cores?action=STATUS&core=foo&wt=json")
             ->andReturn($mockResponse);
 
         $core = new Core($mockClient, $coreName);
@@ -162,19 +162,19 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $count = 123;
         $coreStatus = ['foo' => 'bar'];
 
-        $status = [
+        $status = Json::encode([
             'status' => []
-        ];
+        ]);
 
         $mockResponse = m::mock(Response::class);
-        $mockResponse->shouldReceive('json')
+        $mockResponse->shouldReceive('getBody->getContents')
             ->once()
             ->andReturn($status);
 
         $mockClient = m::mock(Client::class);
         $mockClient->shouldReceive('get')
             ->once()
-            ->with("admin/cores", ['action' => 'STATUS', 'core' => 'foo', 'wt' => 'json'])
+            ->with("admin/cores?action=STATUS&core=foo&wt=json")
             ->andReturn($mockResponse);
 
         $core = new Core($mockClient, $coreName);
@@ -224,14 +224,14 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $headers = ['Content-Type' => 'application/json'];
 
         $mockResponse = m::mock(Response::class);
-        $mockResponse->shouldReceive('json')
+        $mockResponse->shouldReceive('getBody->getContents')
             ->once()
             ->andReturn($retval);
 
         $mockClient = m::mock(Client::class);
         $mockClient->shouldReceive('post')
             ->once()
-            ->with($path, [], $body, $headers)
+            ->with($path, $body, $headers)
             ->andReturn($mockResponse);
 
         $core = new Core($mockClient, $coreName);
@@ -248,18 +248,18 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $select = "name:ivan";
 
         $path = "$coreName/update?commit=true&wt=json";
-        $body = json_encode(["delete" => ["query" => $select]]);
+        $body = Json::encode(["delete" => ["query" => $select]]);
         $headers = ['Content-Type' => 'application/json'];
 
         $mockResponse = m::mock(Response::class);
-        $mockResponse->shouldReceive('json')
+        $mockResponse->shouldReceive('getBody->getContents')
             ->once()
             ->andReturn($retval);
 
         $mockClient = m::mock(Client::class);
         $mockClient->shouldReceive('post')
             ->once()
-            ->with($path, [], $body, $headers)
+            ->with($path, $body, $headers)
             ->andReturn($mockResponse);
 
         $core = new Core($mockClient, $coreName);
@@ -277,18 +277,18 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $select = "name:ivan";
 
         $path = "$coreName/update?commit=true&wt=json";
-        $body = json_encode(["delete" => ["id" => $id]]);
+        $body = Json::encode(["delete" => ["id" => $id]]);
         $headers = ['Content-Type' => 'application/json'];
 
         $mockResponse = m::mock(Response::class);
-        $mockResponse->shouldReceive('json')
+        $mockResponse->shouldReceive('getBody->getContents')
             ->once()
             ->andReturn($retval);
 
         $mockClient = m::mock(Client::class);
         $mockClient->shouldReceive('post')
             ->once()
-            ->with($path, [], $body, $headers)
+            ->with($path, $body, $headers)
             ->andReturn($mockResponse);
 
         $core = new Core($mockClient, $coreName);
@@ -304,12 +304,12 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $expected = "expected response";
 
         $response = m::mock(Response::class);
-        $response->shouldReceive('json')
-            ->andReturn($expected);
+        $response->shouldReceive('getBody->getContents')
+            ->andReturn(Json::encode($expected));
 
         $client = m::mock(Client::class);
         $client->shouldReceive('get')
-            ->with("$coreName/admin/ping", ["wt" => "json"])
+            ->with("$coreName/admin/ping?wt=json")
             ->once()
             ->andReturn($response);
 
@@ -326,12 +326,12 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $handler = "foo/bar";
 
         $response = m::mock(Response::class);
-        $response->shouldReceive('json')
-            ->andReturn($expected);
+        $response->shouldReceive('getBody->getContents')
+            ->andReturn(Json::encode($expected));
 
         $client = m::mock(Client::class);
         $client->shouldReceive('get')
-            ->with("$coreName/$handler", ["wt" => "json"])
+            ->with("$coreName/$handler?wt=json")
             ->once()
             ->andReturn($response);
 
@@ -349,12 +349,12 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $headers = ['Content-Type' => 'application/json'];
 
         $response = m::mock(Response::class);
-        $response->shouldReceive('json')
-            ->andReturn($expected);
+        $response->shouldReceive('getBody->getContents')
+            ->andReturn(Json::encode($expected));
 
         $client = m::mock(Client::class);
         $client->shouldReceive('post')
-            ->with("$coreName/update?commit=true&wt=json", [], null, $headers)
+            ->with("$coreName/update?commit=true&wt=json", null, $headers)
             ->once()
             ->andReturn($response);
 
@@ -371,12 +371,12 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $headers = ['Content-Type' => 'application/json'];
 
         $response = m::mock(Response::class);
-        $response->shouldReceive('json')
-            ->andReturn($expected);
+        $response->shouldReceive('getBody->getContents')
+            ->andReturn(Json::encode($expected));
 
         $client = m::mock(Client::class);
         $client->shouldReceive('post')
-            ->with("$coreName/update?optimize=true&wt=json", [], null, $headers)
+            ->with("$coreName/update?optimize=true&wt=json", null, $headers)
             ->once()
             ->andReturn($response);
 
