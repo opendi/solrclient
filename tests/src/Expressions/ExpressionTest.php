@@ -17,7 +17,6 @@
 namespace Opendi\Solr\Client\Tests\Expressions;
 
 use Opendi\Solr\Client\Expressions\Expression as e;
-use Opendi\Solr\Client\Expressions\Term as t;
 
 class ExpressionTest extends \PHPUnit_Framework_TestCase
 {

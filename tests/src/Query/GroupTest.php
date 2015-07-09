@@ -23,21 +23,36 @@ class GroupTest extends \PHPUnit_Framework_TestCase
 {
     public function testBasicGroup()
     {
-        $filter = new Group();
-        $filter->field('category');
-        $this->assertEquals('group=true&group.field=category', $filter->render());
+        $field = "foo";
 
-        $filter = new Group();
-        $filter->field('category')->format(Group::FORMAT_GROUPED);
-        $this->assertEquals('group=true&group.field=category&group.format=grouped', $filter->render());
+        $group = new Group();
+        $group->field($field);
+        $this->assertEquals("group=true&group.field=$field", $group->render());
 
-        $filter = new Group();
-        $filter->field('category')->main();
-        $this->assertEquals('group=true&group.field=category&group.format=simple&group.main=true', $filter->render());
+        $group = new Group();
+        $group->field($field)->format(Group::FORMAT_GROUPED);
+        $this->assertEquals("group=true&group.field=$field&group.format=grouped", $group->render());
 
-        $filter = new Group();
-        $filter->field('category')->ngroups();
-        $this->assertEquals('group=true&group.field=category&group.ngroups=true', $filter->render());
+        $group = new Group();
+        $group->field($field)->main();
+        $this->assertEquals("group=true&group.field=$field&group.format=simple&group.main=true", $group->render());
+
+        $group = new Group();
+        $group->field($field)->ngroups();
+        $this->assertEquals("group=true&group.field=$field&group.ngroups=true", $group->render());
+
+        $group = new Group();
+        $group->field($field)->truncate();
+        $this->assertEquals("group=true&group.field=$field&group.truncate=true", $group->render());
+
+        $group = new Group();
+        $group->field($field)->facet();
+        $this->assertEquals("group=true&group.field=$field&group.facet=true", $group->render());
+
+        $percent = "10";
+        $group = new Group();
+        $group->field($field)->cache($percent);
+        $this->assertEquals("group=true&group.field=$field&group.cache.percent=$percent", $group->render());
     }
 
     public function testSort()
@@ -68,5 +83,15 @@ class GroupTest extends \PHPUnit_Framework_TestCase
         $actual = Solr::group()->field('foo')->offset(10)->render();
         $expected = "group=true&group.field=foo&group.offset=10";
         $this->assertSame($expected, $actual);
+    }
+
+    public function testMergeToSelect()
+    {
+        $group = Solr::group()->field('foo');
+        $select = Solr::select()->group($group);
+
+        $expected = 'group=true&group.field=foo';
+        $this->assertSame($expected, $group->render());
+        $this->assertSame($expected, $select->render());
     }
 }
