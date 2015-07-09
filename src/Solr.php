@@ -16,8 +16,6 @@
  */
 namespace Opendi\Solr\Client;
 
-use GuzzleHttp\Client as Guzzle;
-
 use Opendi\Solr\Client\Query\Facet;
 use Opendi\Solr\Client\Query\Group;
 use Opendi\Solr\Client\Query\Select;

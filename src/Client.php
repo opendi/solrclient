@@ -20,15 +20,8 @@ use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Uri;
-
-use Opendi\Lang\Json;
-use Opendi\Solr\Client\SolrException;
-
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-
 use InvalidArgumentException;
+use Psr\Http\Message\RequestInterface;
 
 class Client
 {

@@ -16,12 +16,9 @@
  */
 namespace Opendi\Solr\Client;
 
-use GuzzleHttp\Client as Guzzle;
-use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Message\Response;
 
 use Opendi\Lang\Json;
-use Opendi\Solr\Client\Client;
 use Opendi\Solr\Client\Query\Select;
 use Opendi\Solr\Client\Query\Update;
 

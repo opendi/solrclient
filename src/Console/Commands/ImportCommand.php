@@ -17,23 +17,15 @@
 
 namespace Opendi\Solr\Client\Console\Commands;
 
-use GuzzleHttp\Event\ProgressEvent;
-
 use Opendi\Lang\Json;
-
 use Opendi\Solr\Client\Client;
 use Opendi\Solr\Client\Console\AbstractCommand;
 
 use SplFileInfo;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -108,7 +100,7 @@ class ImportCommand extends AbstractCommand
 
         $response = $client->post($path, $fp, $headers);
         $contents = $response->getBody()->getContents();
-        $reply = Json::decode($contents);;
+        $reply = Json::decode($contents);
 
         if ($reply->responseHeader->status != 0) {
             throw new \Exception("Solr returned an error.");
