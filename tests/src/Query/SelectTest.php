@@ -26,8 +26,8 @@ class SelectTest extends \PHPUnit_Framework_TestCase
     public function testBasicSearch()
     {
         $select = new Select();
-        $select->search('opendi', 'name');
-        $this->assertEquals('q=name%3Aopendi', $select->render());
+        $select->search('opendi', 'name')->sort('name');
+        $this->assertEquals('q=name%3Aopendi&sort=name', $select->render());
 
         $select = new Select();
         $select->search('(opendi OR test)', 'name');
@@ -138,6 +138,34 @@ class SelectTest extends \PHPUnit_Framework_TestCase
         $select = new Select();
         $select->search('opendi', 'name')->debug();
         $this->assertEquals('q=name%3Aopendi&debug=all', $select->render());
+    }
+
+    public function testDefaults()
+    {
+        $field = "foo";
+        $op = "bar";
+
+        $select = new Select();
+        $select->defaultField($field)->defaultOperator($op);
+        $this->assertEquals('df=foo&q.op=bar', $select->render());
+    }
+
+    public function testFieldList()
+    {
+        $field = "foo";
+        $select = Solr::select()->fieldList($field);
+        $expected = "fl=$field";
+        $this->assertSame($expected, $select->render());
+
+        $fields = ["foo", "bar", "baz"];
+        $select = Solr::select()->fieldList($fields);
+        $expected = "fl=" . implode("%2C", $fields);
+        $this->assertSame($expected, $select->render());
+
+        $fields = "foo,bar,baz";
+        $select = Solr::select()->fieldList($fields);
+        $expected = "fl=" . urlencode($fields);
+        $this->assertSame($expected, $select->render());
     }
 
     public function testFactory()

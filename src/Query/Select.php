@@ -80,7 +80,7 @@ class Select extends Query
      */
     public function defaultOperator($op)
     {
-        $this->add('q.op', $field);
+        $this->add('q.op', $op);
     }
 
     /**

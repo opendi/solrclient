@@ -21,6 +21,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use InvalidArgumentException;
+use Opendi\Lang\Json;
 use Psr\Http\Message\RequestInterface;
 
 class Client
