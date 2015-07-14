@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2014 Opendi Software AG
+ *  Copyright 2015 Opendi Software AG
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,29 +14,25 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client;
+namespace Opendi\Solr\Client\Query;
 
-class Group
+use Opendi\Solr\Client\Query;
+use Opendi\Solr\Client\SolrException;
+
+/**
+ * Grouping query.
+ *
+ * @see https://cwiki.apache.org/confluence/display/solr/Result+Grouping
+ */
+class Group extends Query
 {
     const FORMAT_GROUPED = 'grouped';
     const FORMAT_SIMPLE = 'simple';
 
-    /**
-     * Holds the query separated into an array of two-value arrays.
-     *
-     * For example:
-     * ```
-     * $this->query = [
-     *     ['field' => 'place'],
-     *     ['limit' => 100]
-     * ]
-     * ```
-     *
-     * When rendered, this will become: `field=place&limit=100`.
-     *
-     * @var array
-     */
-    private $query = [];
+    public function __construct()
+    {
+        $this->add('group', 'true');
+    }
 
     /**
      * Identifies a field to be treated as a group.
@@ -49,7 +45,7 @@ class Group
      */
     public function field($field)
     {
-        return $this->param('group.field', $field);
+        return $this->add('group.field', $field);
     }
 
     /**
@@ -59,23 +55,9 @@ class Group
      * @param  string $sort Sort value.
      * @return Group
      */
-    public function groupSort($sort)
-    {
-        return $this->param('group.sort', $sort);
-    }
-
-    /**
-     * How to sort the groups relative to each other.
-     * For example, sort=popularity desc will cause the groups
-     * to be sorted according to the highest popularity doc in each group.
-     * Defaults to "score desc".
-     *
-     * @param  string $sort Sort value.
-     * @return Group
-     */
     public function sort($sort)
     {
-        return $this->param('sort', $sort);
+        return $this->add('group.sort', $sort);
     }
 
     /**
@@ -87,7 +69,7 @@ class Group
      */
     public function limit($limit)
     {
-        return $this->param('group.limit', $limit);
+        return $this->add('group.limit', $limit);
     }
 
     /**
@@ -99,7 +81,7 @@ class Group
      */
     public function offset($offset)
     {
-        return $this->param('group.offset', $offset);
+        return $this->add('group.offset', $offset);
     }
 
     /**
@@ -115,10 +97,10 @@ class Group
      */
     public function format($format)
     {
-        if (!in_array($format,[self::FORMAT_GROUPED, self::FORMAT_SIMPLE])) {
+        if (!in_array($format, [self::FORMAT_GROUPED, self::FORMAT_SIMPLE])) {
             throw new SolrException("Invalid group format");
         }
-        return $this->param('group.format', $format);
+        return $this->add('group.format', $format);
     }
 
     /**
@@ -129,8 +111,8 @@ class Group
      */
     public function main()
     {
-        $this->param('group.format', self::FORMAT_SIMPLE);
-        return $this->param('group.main', 'true');
+        $this->add('group.format', self::FORMAT_SIMPLE);
+        return $this->add('group.main', 'true');
     }
 
     /**
@@ -147,7 +129,7 @@ class Group
      */
     public function ngroups()
     {
-        return $this->param('group.ngroups', 'true');
+        return $this->add('group.ngroups', 'true');
     }
 
     /**
@@ -163,7 +145,7 @@ class Group
      */
     public function truncate()
     {
-        return $this->param('group.truncate', 'true');
+        return $this->add('group.truncate', 'true');
     }
 
     /**
@@ -186,7 +168,7 @@ class Group
      */
     public function facet()
     {
-        return $this->param('group.facet', 'true');
+        return $this->add('group.facet', 'true');
     }
 
     /**
@@ -203,43 +185,6 @@ class Group
      */
     public function cache($number)
     {
-        return $this->param('group.cache.percent', $number);
-    }
-
-    /**
-     * Generic setter for query parameters.
-     *
-     * @param string $name
-     * @param string $value
-     * @param string $field
-     * @return $this
-     */
-    private function param($name, $value, $field = null)
-    {
-        // Apply the parameter to a specific field
-        if (!empty($field)) {
-            $name = "$field.$name";
-        }
-
-        $this->query[] = [$name, $value];
-
-        return $this;
-    }
-
-    /**
-     * Converts the facet to a http encoded query.
-     */
-    public function render()
-    {
-        $query = [
-            'group=true'
-        ];
-
-        foreach ($this->query as $item) {
-            list($name, $value) = $item;
-            $query[] = implode("=", [$name, urlencode($value)]);
-        }
-
-        return implode("&", $query);
+        return $this->add('group.cache.percent', $number);
     }
 }

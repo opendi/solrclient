@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2014 Opendi Software AG
+ *  Copyright 2015 Opendi Software AG
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client\Tests;
+namespace Opendi\Solr\Client\Tests\Query;
 
-use Opendi\Solr\Client\Facet;
+use Opendi\Solr\Client\Query\Facet;
 use Opendi\Solr\Client\Solr;
 
 class FacetTest extends \PHPUnit_Framework_TestCase

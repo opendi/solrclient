@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2014 Opendi Software AG
+ *  Copyright 2015 Opendi Software AG
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,9 +14,21 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client\Parsers;
+namespace Opendi\Solr\Client\Tests\Query;
 
-interface ParserInterface
+use Opendi\Solr\Client\Query\EDisMaxSelect;
+
+class EDisMaxSelectTest extends \PHPUnit_Framework_TestCase
 {
-    public function render();
+    public function testDismaxBasic()
+    {
+        $boost = "foo";
+
+        $select = new EDisMaxSelect();
+        $select->boost($boost);
+
+        $expected = "defType=edismax&boost=$boost";
+        $actual = $select->render();
+
+        $this->assertSame($expected, $actual);    }
 }

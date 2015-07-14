@@ -23,19 +23,19 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class PingCommand extends AbstractCommand
+class OptimizeCommand extends AbstractCommand
 {
     protected function configure()
     {
         parent::configure();
 
         $this
-            ->setName('ping')
-            ->setDescription("Pings the Solr server to check it's up.")
+            ->setName('optimize')
+            ->setDescription("Optimizes a SOLR core.")
             ->addArgument(
                 'core',
                 InputArgument::REQUIRED,
-                'Name of the core to ping.'
+                'Name of the core.'
             );
     }
 
@@ -45,12 +45,17 @@ class PingCommand extends AbstractCommand
 
         $core = $input->getArgument('core');
 
-        $ping = $client->core($core)->ping();
+        $result = $client->core($core)->optimize();
 
-        $time = $ping['responseHeader']['QTime'];
-        $status = $ping['status'];
+        $time = $result['responseHeader']['QTime'];
 
-        $output->writeln("\nStatus: <info>$status</info>");
-        $output->writeln("Time: <info>$time ms</info>");
+        if ($time >= 1000) {
+            $time = number_format($time / 1000, 2) . " s";
+        } else {
+            $time .= " ms";
+        }
+
+        $output->writeln("Done.");
+        $output->writeln("Time taken: <comment>$time</comment>\n");
     }
 }

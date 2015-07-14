@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2014 Opendi Software AG
+ *  Copyright 2015 Opendi Software AG
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,12 +17,20 @@
 namespace Opendi\Solr\Client;
 
 use GuzzleHttp\Client as Guzzle;
-use GuzzleHttp\Message\RequestInterface;
-
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use InvalidArgumentException;
+use Opendi\Lang\Json;
+use Psr\Http\Message\RequestInterface;
 
 class Client
 {
+    /**
+     * Guzzle HTTP client.
+     *
+     * @var GuzzleHttp\Client
+     */
     private $guzzle;
 
     private $cores = [];
@@ -30,12 +38,6 @@ class Client
     public function __construct(Guzzle $guzzle)
     {
         $this->guzzle = $guzzle;
-
-        // Check a base url has been set
-        $base = $this->guzzle->getBaseUrl();
-        if (empty($base)) {
-            throw new SolrException("You need to set a base_url on Guzzle client.");
-        }
     }
 
     /**
@@ -44,14 +46,13 @@ class Client
      * @param  string $url      URL to the solr instance.
      * @param  array  $defaults Default options for guzzle.
      *
-     * @return Opendi\Solr\Client\Client
+     * @return Client
      */
     public static function factory($url, array $defaults = [])
     {
-        $guzzle = new Guzzle([
-            'base_url' => $url,
-            'defaults' => $defaults
-        ]);
+        $defaults['base_uri'] = $url;
+
+        $guzzle = new Guzzle($defaults);
 
         return new self($guzzle);
     }
@@ -76,21 +77,33 @@ class Client
     }
 
     /**
-     * Returns the underlying Guzzle client's event emitter.
+     * Returns core status info.
      *
-     * @return GuzzleHttp\Event\EmitterInterface
-     *
-     * @see  http://guzzle.readthedocs.org/en/latest/events.html
+     * @param string $core Name of the core to return the status for, or null
+     *                     to return status for all cores.
      */
-    public function getEmitter()
+    public function status($core = null)
     {
-        return $this->guzzle->getEmitter();
+        $query = [
+            "action" => "STATUS",
+            "wt" => "json"
+        ];
+
+        if (isset($core)) {
+            $query['core'] = $core;
+        }
+
+        $path = "admin/cores?" . http_build_query($query);
+
+        $response = $this->get($path);
+        $contents = $response->getBody()->getContents();
+        return Json::decode($contents, true);
     }
 
     /**
      * Returns the underlying Guzzle client.
      *
-     * @return GuzzleHttp\Client
+     * @return Guzzle
      */
     public function getGuzzleClient()
     {
@@ -100,43 +113,41 @@ class Client
     /**
      * Performs a GET request.
      *
-     * @param  string $url
-     * @param  array  $query
+     * @param  string $uri
      *
-     * @return GuzzleHttp\Message\Response
+     * @return Response
      */
-    public function get($url, array $query = [])
+    public function get($uri, $headers = [])
     {
-        $options = [
-            'query' => $query
-        ];
-
-        $request = $this->guzzle->createRequest('GET', $url, $options);
+        $request = $this->formGetRequest($uri, $headers);
 
         return $this->send($request);
+    }
+
+    public function formGetRequest($uri, $headers)
+    {
+        return new Request('GET', $uri, $headers);
     }
 
     /**
      * Performs a POST request.
      *
-     * @param  string $url
-     * @param  array  $query
+     * @param  string $uri
      * @param  mixed  $body
      * @param  array  $headers
      *
-     * @return GuzzleHttp\Message\Response
+     * @return Response
      */
-    public function post($url, array $query = [], $body = null, array $headers = [])
+    public function post($uri, $body = null, array $headers = [])
     {
-        $options = [
-            'query' => $query,
-            'headers' => $headers,
-            'body' => $body
-        ];
-
-        $request = $this->guzzle->createRequest('POST', $url, $options);
+        $request = $this->formPostRequest($uri, $body, $headers);
 
         return $this->send($request);
+    }
+
+    public function formPostRequest($uri, $body = null, array $headers = [])
+    {
+        return new Request('POST', $uri, $headers, $body);
     }
 
     public function send(RequestInterface $request)
@@ -154,16 +165,84 @@ class Client
     {
         if ($ex->hasResponse()) {
             $response = $ex->getResponse();
-
-            $reason = $response->getReasonPhrase();
             $code = $response->getStatusCode();
-            $data = $response->json();
+            $reason = $response->getReasonPhrase();
 
-            $msg = $data['error']['msg'];
-
-            throw new \Exception("Solr error HTTP $code $reason:  $msg", 0, $ex);
+            $msg = $this->getSolrErrorMessage($response);
+            if ($msg !== null) {
+                throw new SolrException("Solr returned HTTP $code $reason: $msg", 0, $ex);
+            } else {
+                throw new SolrException("Solr returned HTTP $code $reason", 0, $ex);
+            }
         }
 
-        throw new \Exception("Solr query failed", 0, $ex);
+        throw new SolrException("Solr query failed", 0, $ex);
+    }
+
+    /**
+     * Attempt to extract a Solr error message from a response.
+     *
+     * @param  Response $response The response.
+     * @return string Error message or NULL if not found.
+     */
+    private function getSolrErrorMessage(Response $response)
+    {
+        // Try to get the SOLR error message from the response body
+        $contentType = $response->getHeaderLine("Content-Type");
+        $content = $response->getBody()->getContents();
+
+        // If response contains XML
+        if (strpos($contentType, 'application/xml') !== false) {
+            return $this->getXmlError($content);
+        }
+
+        // If response contains JSON
+        if (strpos($contentType, 'application/json') !== false) {
+            return $this->getJsonError($content);
+        }
+
+        // Message not found
+        return null;
+    }
+
+    /**
+     * Attempt to extract a Solr error message from an XML response.
+     *
+     * @param  string $content Response contents.
+     * @return string Error message or NULL if not found.
+     */
+    private function getXmlError($content)
+    {
+        $xml = simplexml_load_string($content);
+        if ($xml === false) {
+            return null;
+        }
+
+        $msgs = $xml->xpath('lst[@name="error"]/str[@name="msg"]');
+        if (!empty($msgs)) {
+            return strval($msgs[0]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Attempt to extract a Solr error message from an JSON response.
+     *
+     * @param  string $content Response contents.
+     * @return string Error message or NULL if not found.
+     */
+    private function getJsonError($content)
+    {
+        $data = json_decode($content);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return null;
+        }
+
+        if (isset($data->error->msg)) {
+            return $data->error->msg;
+        }
+
+        return null;
     }
 }

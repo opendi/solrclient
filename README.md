@@ -39,18 +39,15 @@ $solr = new Client($guzzle);
 
 See [Guzzle documentation](http://docs.guzzlephp.org/) for all options.
 
-There is a helper `factory()` method which does the same as above.
+There is a helper `factory($url, $defaults)` static method which does the same
+as above.
 
 ```php
 use Opendi\Solr\Client\Client;
 
-$url = "http://localhost:8983/solr/";
-
-$defaults = [
+$solr = Client::factory('http://localhost:8983/solr/', [
     'timeout' => 10
-];
-
-$solr = Client::factory($url, $defaults);
+]);
 ```
 
 Working with cores
@@ -71,7 +68,7 @@ $update = Solr::update()->body('{}');
 $client->core('places')->update($update);
 ```
 
-The Core object also offers some helper methods:
+The Core object offers some helper methods:
 
 ```php
 // Returns core status
@@ -88,4 +85,13 @@ $client->core('places')->deleteByQuery('name:Opendi');
 
 // Deletes record with the given ID
 $client->core('places')->deleteByID('100');
+
+// Checks the core is up
+$client->core('places')->ping();
+
+// Optimizes core documents
+$client->core('places')->optimize();
+
+// Commits inserted documents
+$client->core('places')->commit();
 ```

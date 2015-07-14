@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2014 Opendi Software AG
+ *  Copyright 2015 Opendi Software AG
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
         $container = new \Pimple\Container();
 
         $provider = new SolrClientServiceProvider([
-            'base_url' => $url
+            'base_uri' => $url
         ]);
 
         $container->register($provider);
@@ -36,12 +36,14 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
         $client = $container['solr'];
 
         $this->assertInstanceOf(Client::class, $client);
-        $this->assertSame($url, $client->getGuzzleClient()->getBaseUrl());
+
+        $actual = (string) $client->getGuzzleClient()->getConfig('base_uri');
+        $this->assertSame($url, $actual);
     }
 
     /**
      * @expectedException Exception
-     * @expectedExceptionMessage You must give a base_url for the solr provider
+     * @expectedExceptionMessage You must give a base_uri for the solr provider
      */
     public function testNoBaseUrl()
     {
