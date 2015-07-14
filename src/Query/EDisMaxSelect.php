@@ -14,22 +14,31 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
+namespace Opendi\Solr\Client\Query;
 
-namespace Opendi\Solr\Client\Console;
-
-use Symfony\Component\Console\Application;
-
-class SolrApplication extends Application
+/**
+ * A query for the DisMax query parser.
+ *
+ * @see https://cwiki.apache.org/confluence/display/solr/The+Extended+DisMax+Query+Parser
+ */
+class EDisMaxSelect extends DisMaxSelect
 {
-    protected function getDefaultCommands()
+    protected $defType = "edismax";
+
+    /**
+     * Add a boost multiplier.
+     *
+     * Strings are parsed as queries with scores multiplied by the score from
+     * the main query for all matching documents.
+     *
+     * @param  string $query The boost query
+     *
+     * @return EdisMaxSelect
+     */
+    public function boost($query)
     {
-        $defaultCommands = parent::getDefaultCommands();
-        $defaultCommands[] = new Commands\CommitCommand();
-        $defaultCommands[] = new Commands\DeleteCommand();
-        $defaultCommands[] = new Commands\ImportCommand();
-        $defaultCommands[] = new Commands\PingCommand();
-        $defaultCommands[] = new Commands\OptimizeCommand();
-        $defaultCommands[] = new Commands\StatusCommand();
-        return $defaultCommands;
+        $this->add("boost", $query);
+
+        return $this;
     }
 }

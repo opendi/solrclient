@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2014 Opendi Software AG
+ *  Copyright 2015 Opendi Software AG
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,9 +14,17 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client;
+namespace Opendi\Solr\Client\Query;
 
-class Facet
+use Opendi\Solr\Client\Query;
+use Opendi\Solr\Client\SolrException;
+
+/**
+ * Faceting query.
+ *
+ * @see https://cwiki.apache.org/confluence/display/solr/Faceting
+ */
+class Facet extends Query
 {
     const SORT_COUNT = 'count';
     const SORT_INDEX = 'index';
@@ -27,22 +35,10 @@ class Facet
         self::SORT_INDEX,
     ];
 
-    /**
-     * Holds the query separated into an array of two-value arrays.
-     *
-     * For example:
-     * ```
-     * $this->query = [
-     *     ['field' => 'place'],
-     *     ['limit' => 100]
-     * ]
-     * ```
-     *
-     * When rendered, this will become: `field=place&limit=100`.
-     *
-     * @var array
-     */
-    private $query = [];
+    public function __construct()
+    {
+        $this->add('facet', 'true');
+    }
 
     /**
      * Identifies a field to be treated as a facet.
@@ -97,7 +93,7 @@ class Facet
      */
     public function sortByCount($field = null)
     {
-        return $this->sort('count', $field);
+        return $this->sort(self::SORT_COUNT, $field);
     }
 
     /**
@@ -107,7 +103,7 @@ class Facet
      */
     public function sortByIndex($field = null)
     {
-        return $this->sort('index', $field);
+        return $this->sort(self::SORT_INDEX, $field);
     }
 
     /**
@@ -185,7 +181,8 @@ class Facet
      * create multiple "facet_pivot" sections in the response.
      *
      * @param  string|array $fields One or more field names.
-     * @return [type]         [description]
+     *
+     * @return Facet
      */
     public function pivot()
     {
@@ -210,25 +207,6 @@ class Facet
             $name = "f.$field.$name";
         }
 
-        $this->query[] = [$name, $value];
-
-        return $this;
-    }
-
-    /**
-     * Converts the facet to a http encoded query.
-     */
-    public function render()
-    {
-        $query = [
-            'facet=true'
-        ];
-
-        foreach ($this->query as $item) {
-            list($name, $value) = $item;
-            $query[] = implode("=", [$name, urlencode($value)]);
-        }
-
-        return implode("&", $query);
+        return $this->add($name, $value);
     }
 }

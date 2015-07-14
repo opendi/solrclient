@@ -1,6 +1,19 @@
 Opendi Solr Client Changelog
 ============================
 
+1.0.0-beta1 (2015-07-14)
+------------------------
+
+* Reorganized code sructure (BC thoroughly broken)
+* Queries moved to `Query` subnamespace
+* Removed `Parser` classes, replaced by Select subclasses
+* Removed `Filter` classes, replaced by `Select::filter()`
+* Reimplemented `Expression` and added `Term`
+* Added a Pimple service provider
+* Added more options to queries
+* `Core::update()` and `Core::select()` will request and decode JSON. Use `raw`
+  variants to avoid this.
+
 0.5.0 (2015-04-07)
 ------------------
 

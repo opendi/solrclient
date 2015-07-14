@@ -1,17 +1,28 @@
 <?php
+/*
+ *  Copyright 2015 Opendi Software AG
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed
+ *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ *  either express or implied. See the License for the specific
+ *  language governing permissions and limitations under the License.
+ */
 
 namespace Opendi\Solr\Client\Console;
 
 use Opendi\Solr\Client\Client;
-
 use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Event\BeforeEvent;
-use GuzzleHttp\Event\ErrorEvent;
-use GuzzleHttp\Event\HeadersEvent;
-use GuzzleHttp\Exception\ParseException;
-
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -63,6 +74,11 @@ abstract class AbstractCommand extends Command
             );
     }
 
+    /**
+     * Constructs a Solr client from input params.
+     *
+     * @return Client
+     */
     protected function getClient(InputInterface $input, OutputInterface $output)
     {
         if (isset($this->client)) {
@@ -84,69 +100,29 @@ abstract class AbstractCommand extends Command
             $output->writeln("Basic auth: <info>$username</info>");
         }
 
-        $output->writeln("");
+        // Middleware which logs requests
+        $before = function (Request $request, $options) use ($output) {
+            $url = $request->getUri();
+            $method = $request->getMethod();
+            $output->writeln(sprintf("<info>%s</info> %s ", $method, $url));
+        };
+
+        // Setup the default handler stack and add the logging middleware
+        $stack = HandlerStack::create();
+        $stack->push(Middleware::tap($before));
 
         // Guzzle options
-        $options = ['base_url' => $baseURL];
+        $options = [
+            'base_uri' => $baseURL,
+            'handler' => $stack
+        ];
+
         if (isset($username)) {
-            $options['defaults']['auth'] = [$username, $password];
+            $options['auth'] = [$username, $password];
         }
 
-        // Construct and return the client
         $guzzle = new GuzzleClient($options);
 
-        $this->setupRequestLogging($guzzle, $output);
-
         return new Client($guzzle);
-    }
-
-    private function setupRequestLogging(GuzzleClient $guzzle, $output)
-    {
-        $emitter = $guzzle->getEmitter();
-
-        //  Show the method and URL before each request
-        $emitter->on('before', function (BeforeEvent $e) use ($output) {
-            $url = $e->getRequest()->getUrl();
-            $method = $e->getRequest()->getMethod();
-
-            $output->write(sprintf("<info>%s</info> %s ", $method, $url));
-        });
-
-        // Show status code after the request
-        $emitter->on('headers', function (HeadersEvent $e) use ($output) {
-            $code = $e->getResponse()->getStatusCode();
-            $reason = $e->getResponse()->getReasonPhrase();
-
-            if ($code < 300) {
-                $msg = "<info>$code $reason</info>";
-            } else {
-                $msg = "<error>$code $reason</error>";
-            }
-
-            $output->writeln($msg);
-        });
-
-        // On error, display the Solr error message from the response if
-        // possible
-        $emitter->on('error', function (ErrorEvent $e) use ($output) {
-            $response = $e->getResponse();
-
-            if ($response !== null) {
-                // If there is a response, try to parse it to get the Solr error
-                try {
-                    $data = $response->json();
-
-                    if (isset($data['error']['msg'])) {
-                        $error = "Solr error: " . $data['error']['msg'];
-
-                        $output-> writeln("");
-                        $output-> writeln("<error>$error</error>");
-                        return;
-                    }
-                } catch (ParseException $e) {
-                    // Cannot parse :(
-                }
-            }
-        });
     }
 }

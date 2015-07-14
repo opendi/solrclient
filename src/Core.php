@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2014 Opendi Software AG
+ *  Copyright 2015 Opendi Software AG
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
  */
 namespace Opendi\Solr\Client;
 
-use GuzzleHttp\Client as Guzzle;
-use GuzzleHttp\Exception\RequestException;
-
+use GuzzleHttp\Psr7\Response;
 use Opendi\Lang\Json;
+use Opendi\Solr\Client\Query\Select;
+use Opendi\Solr\Client\Query\Update;
 
 /**
  * Functionality which can be invoked on a Solr core.
@@ -29,7 +29,7 @@ class Core
     /**
      * The Solr Client, used for making requests.
      *
-     * @var Opendi\Solr\Client\Client
+     * @var Client
      */
     private $client;
 
@@ -49,27 +49,106 @@ class Core
         $this->name = $name;
     }
 
+    /**
+     * Performs a select query, forces wt=json and decodes the response.
+     *
+     * @param  Select $select  The query to send.
+     *
+     * @return object          Decoded response data.
+     */
     public function select(Select $select)
     {
-        $query = $select->render();
-        $url = "$this->name/select?$query";
+        // Force resulting data to be json-encoded
+        $select->format('json');
 
-        $response = $this->client->get($url);
-
-        return (string) $response->getBody(true);
+        $response = $this->selectRaw($select);
+        $contents = $response->getBody()->getContents();
+        return Json::decode($contents, true);
     }
 
+    /**
+     * Performs a select query, returns the raw response.
+     *
+     * Unlike select(), does not force wt=json.
+     *
+     * @param  Select $select The query to send.
+     *
+     * @return Response
+     */
+    public function selectRaw(Select $select)
+    {
+        $path = $this->selectPath($select);
+
+        return $this->client->get($path);
+    }
+
+    /**
+     * Returns the path, including the query string, for a given select query.
+     *
+     * @param  Select $select
+     *
+     * @return string
+     */
+    public function selectPath(Select $select)
+    {
+        $query = $select->render();
+
+        return "$this->name/select?$query";
+    }
+
+    /**
+     * Performs an update query, forces wt=json and decodes the response.
+     *
+     * @param  Update $update
+     *
+     * @return array
+     */
     public function update(Update $update)
     {
+        // Force resulting data to be json-encoded
+        $update->format('json');
+
+        $response = $this->updateRaw($update);
+        $contents = $response->getBody()->getContents();
+        return Json::decode($contents, true);
+    }
+
+    /**
+     * Performs an update query, returns the raw response.
+     *
+     * Unlike update(), does not force wt=json.
+     *
+     * @param  Update $update
+     *
+     * @return Response
+     */
+    public function updateRaw(Update $update)
+    {
+        $path = $this->updatePath($update);
+
+        $body = $update->getBody();
+        $contentType = $update->getContentType();
+
+        $headers = [];
+        if (isset($contentType)) {
+            $headers['Content-Type'] = $contentType;
+        }
+
+        return $this->client->post($path, $body, $headers);
+    }
+
+    /**
+     * Returns the path, including the query string, for a given update query.
+     *
+     * @param  Update $update
+     *
+     * @return string
+     */
+    public function updatePath(Update $update)
+    {
         $query = $update->render();
-        $url = "$this->name/update?$query";
 
-        $response = $this->client->post($url, [
-            'body' => $update->getBody(),
-            'headers' => ['Content-Type' => 'application/json']
-        ]);
-
-        return (string) $response->getBody(true);
+        return "$this->name/update?$query";
     }
 
     /**
@@ -80,14 +159,18 @@ class Core
     public function status()
     {
         $core = $this->name;
-        $path = "admin/cores";
-        $query = [
+
+        $query = http_build_query([
             "action" => "STATUS",
             "core" => $core,
             "wt" => "json"
-        ];
+        ]);
 
-        $data = $this->client->get($path, $query)->json();
+        $path = "admin/cores?$query";
+
+        $response = $this->client->get($path);
+        $contents = $response->getBody()->getContents();
+        $data = Json::decode($contents, true);
 
         if (empty($data['status'][$core])) {
             throw new \Exception("Core \"$core\" does not exist.");
@@ -99,18 +182,19 @@ class Core
     /**
      * Returns the number of records in the core.
      *
+     * @param  string $query If given, will count documents matching the query.
+     *
      * @return integer
      */
-    public function count()
+    public function count($query = "*:*")
     {
         $select = Solr::select()
-            ->search('*:*')
-            ->rows(0)
-            ->format('json');
+            ->search($query)
+            ->rows(0);
 
-        $result = Json::decode($this->select($select));
+        $result = $this->select($select);
 
-        return $result->response->numFound;
+        return $result['response']['numFound'];
     }
 
     /**
@@ -126,26 +210,17 @@ class Core
      */
     public function deleteByID($id, $commit = true)
     {
-        $core = $this->name;
-
-        $path = "$core/update";
-
-        $query = [
-            "commit" => $commit ? "true" : "false",
-            "wt" => "json"
-        ];
-
-        $headers = [
-            'Content-Type' => 'application/json'
-        ];
-
         $body = Json::encode([
             "delete" => [
                 "id" => $id
             ]
         ]);
 
-        return $this->client->post($path, $query, $body, $headers)->json();
+        $update = Solr::update()
+            ->body($body)
+            ->commit($commit);
+
+        return $this->update($update);
     }
 
     /**
@@ -153,43 +228,61 @@ class Core
      */
     public function deleteByQuery($select, $commit = true)
     {
-        $core = $this->name;
-
-        $path = "$core/update";
-
-        $query = [
-            "commit" => $commit ? "true" : "false",
-            "wt" => "json"
-        ];
-
-        $headers = [
-            'Content-Type' => 'application/json'
-        ];
-
         $body = Json::encode([
             "delete" => [
                 "query" => $select
             ]
         ]);
 
-        return $this->client->post($path, $query, $body, $headers)->json();
+        $update = Solr::update()
+            ->body($body)
+            ->commit($commit);
+
+        return $this->update($update);
     }
 
     /**
      * Pings the server to check it's there.
      *
-     * @return array Solr's reply.
-     * @throws SolrException If server does not respond.
+     * @return array Decoded response from the Solr server.
      */
     public function ping()
     {
         $path = implode('/', [$this->name, $this->pingHandler]);
+        $path = "$path?wt=json";
 
-        $response = $this->client->get($path, [
-            'wt' => 'json'
-        ]);
+        $response = $this->client->get($path);
+        $contents = $response->getBody()->getContents();
+        return Json::decode($contents, true);
+    }
 
-        return $response->json();
+    /**
+     * Optimizes the data in the core.
+     *
+     * @return array Decoded response from the Solr server.
+     */
+    public function optimize()
+    {
+        $update = new Update();
+        $update->optimize();
+
+        return $this->update($update);
+    }
+
+    /**
+     * Commits the data in the core.
+     *
+     * This will make all data which was sent previously, but not commited,
+     * available for search.
+     *
+     * @return array Decoded response from the Solr server.
+     */
+    public function commit()
+    {
+        $update = new Update();
+        $update->commit();
+
+        return $this->update($update);
     }
 
     /**
@@ -205,5 +298,25 @@ class Core
     public function setPingHandler($handler)
     {
         $this->pingHandler = $handler;
+    }
+
+    /**
+     * Returns the core name.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Returns the underlying Solr client.
+     *
+     * @return Client
+     */
+    public function getClient()
+    {
+        return $this->client;
     }
 }
