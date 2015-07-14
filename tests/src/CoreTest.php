@@ -42,11 +42,11 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $query = $select->render();
 
         $coreName = "foo";
-        $path = "$coreName/select?$query";
+        $path = "$coreName/select?$query&wt=json";
         $expected = "123";
 
         $mockResponse = m::mock(Response::class);
-        $mockResponse->shouldReceive('getBody')
+        $mockResponse->shouldReceive('getBody->getContents')
             ->once()
             ->andReturn($expected);
 
@@ -59,7 +59,7 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $core = new Core($mockClient, $coreName);
         $actual = $core->select($select);
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame(json_decode($expected), $actual);
     }
 
     public function testUpdate()
@@ -198,7 +198,7 @@ class CoreTest extends \PHPUnit_Framework_TestCase
         $expected = "123";
 
         $mockResponse = m::mock(Response::class);
-        $mockResponse->shouldReceive('getBody')
+        $mockResponse->shouldReceive('getBody->getContents')
             ->once()
             ->andReturn($response);
 

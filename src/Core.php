@@ -16,7 +16,7 @@
  */
 namespace Opendi\Solr\Client;
 
-use GuzzleHttp\Message\Response;
+use GuzzleHttp\Psr7\Response;
 
 use Opendi\Lang\Json;
 use Opendi\Solr\Client\Query\Select;
@@ -50,15 +50,46 @@ class Core
         $this->name = $name;
     }
 
+    /**
+     * Performs a select query, forces wt=json and decodes the response.
+     *
+     * @param  Select $select  The query to send.
+     *
+     * @return object          Decoded response data.
+     */
     public function select(Select $select)
+    {
+        // Force resulting data to be json-encoded
+        $select->format('json');
+
+        $response = $this->selectRaw($select);
+        $contents = $response->getBody()->getContents();
+        return Json::decode($contents, true);
+    }
+
+    /**
+     * Performs a select query, returns the raw response.
+     *
+     * Unlike select(), does not force wt=json.
+     *
+     * @param  Select $select The query to send.
+     *
+     * @return Response
+     */
+    public function selectRaw(Select $select)
     {
         $path = $this->selectPath($select);
 
-        $response = $this->client->get($path);
-
-        return (string) $response->getBody(true);
+        return $this->client->get($path);
     }
 
+    /**
+     * Returns the path, including the query string, for a given select query.
+     *
+     * @param  Select $select
+     *
+     * @return string
+     */
     public function selectPath(Select $select)
     {
         $query = $select->render();
@@ -67,11 +98,9 @@ class Core
     }
 
     /**
-     * Performs an update query.
+     * Performs an update query, forces wt=json and decodes the response.
      *
-     * Forces wt=json and decodes the response.
-     *
-     * @param  Update $updat
+     * @param  Update $update
      *
      * @return array
      */
@@ -86,7 +115,7 @@ class Core
     }
 
     /**
-     * Performs an Update query and returns the raw response.
+     * Performs an update query, returns the raw response.
      *
      * Unlike update(), does not force wt=json.
      *
@@ -109,6 +138,13 @@ class Core
         return $this->client->post($path, $body, $headers);
     }
 
+    /**
+     * Returns the path, including the query string, for a given update query.
+     *
+     * @param  Update $update
+     *
+     * @return string
+     */
     public function updatePath(Update $update)
     {
         $query = $update->render();
@@ -155,12 +191,11 @@ class Core
     {
         $select = Solr::select()
             ->search($query)
-            ->rows(0)
-            ->format('json');
+            ->rows(0);
 
-        $result = Json::decode($this->select($select));
+        $result = $this->select($select);
 
-        return $result->response->numFound;
+        return $result['response']['numFound'];
     }
 
     /**
