@@ -3,19 +3,21 @@ solrclient
 
 Classes for the busy PHP developer to work with Apache Solr.
 
-[ ![Codeship Status for opendi/solrclient](https://codeship.com/projects/d48f8a90-4e5a-0132-5b16-220cbe717b80/status)](https://codeship.com/projects/47655)
+[![Circle CI](https://img.shields.io/circleci/project/opendi/solrclient.svg?style=flat-square)](https://circleci.com/gh/opendi/solrclient)
+[![Packagist](https://img.shields.io/packagist/v/opendi/solrclient.svg?style=flat-square)]()
+[![License](https://img.shields.io/github/license/opendi/solrclient.svg)](https://github.com/opendi/solrclient/blob/develop/LICENSE)
 
 Construction
 ------------
 
-First, you must construct a Guzzle HTTP client and set the base_url option to
+First, you must construct a Guzzle HTTP client and set the `base_uri` option to
 the Solr endpoint you wish to work with. Then use it to create a Solr Client.
 
 ```php
 use Opendi\Solr\Client\Client;
 
 $guzzle = new \GuzzleHttp\Client([
-    'base_url' => "http://localhost:8983/solr/"
+    'base_uri' => "http://localhost:8983/solr/"
 ]);
 
 $client = new Client($guzzle);
@@ -28,7 +30,7 @@ timeouts to the Guzzle client.
 use Opendi\Solr\Client\Client;
 
 $guzzle = new \GuzzleHttp\Client([
-    'base_url' => "http://localhost:8983/solr/",
+    'base_uri' => "http://localhost:8983/solr/",
     'defaults' => [
         'timeout' => 10
     ]
