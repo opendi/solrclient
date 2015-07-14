@@ -19,7 +19,6 @@ namespace Opendi\Solr\Client\Providers;
 
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
-
 use GuzzleHttp\Client as GuzzleClient;
 use Opendi\Solr\Client\Client as SolrClient;
 

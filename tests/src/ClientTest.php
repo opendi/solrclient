@@ -17,11 +17,9 @@
 namespace Opendi\Solr\Client\Tests;
 
 use Mockery as m;
-
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-
 use Opendi\Solr\Client\Client;
 use Opendi\Solr\Client\Core;
 

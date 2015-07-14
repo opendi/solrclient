@@ -20,9 +20,7 @@ namespace Opendi\Solr\Client\Console\Commands;
 use Opendi\Lang\Json;
 use Opendi\Solr\Client\Client;
 use Opendi\Solr\Client\Console\AbstractCommand;
-
 use SplFileInfo;
-
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

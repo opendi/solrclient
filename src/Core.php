@@ -17,7 +17,6 @@
 namespace Opendi\Solr\Client;
 
 use GuzzleHttp\Psr7\Response;
-
 use Opendi\Lang\Json;
 use Opendi\Solr\Client\Query\Select;
 use Opendi\Solr\Client\Query\Update;

@@ -112,7 +112,7 @@ class FacetTest extends \PHPUnit_Framework_TestCase
         $expected = "facet=true&facet.field=foo&facet.pivot=foo";
         $this->assertSame($expected, $actual);
 
-        $actual = Solr::facet()->field('foo')->pivot('foo','bar','baz')->render();
+        $actual = Solr::facet()->field('foo')->pivot('foo', 'bar', 'baz')->render();
         $expected = "facet=true&facet.field=foo&facet.pivot=" . urlencode('foo,bar,baz');
         $this->assertSame($expected, $actual);
     }

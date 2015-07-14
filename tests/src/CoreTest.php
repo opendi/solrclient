@@ -17,16 +17,13 @@
 namespace Opendi\Solr\Client\Tests;
 
 use Mockery as m;
-
 use GuzzleHttp\Subscriber\Mock;
 use GuzzleHttp\Message\Response;
-
 use Opendi\Solr\Client\Client;
 use Opendi\Solr\Client\Select;
 use Opendi\Solr\Client\Solr;
 use Opendi\Solr\Client\Update;
 use Opendi\Solr\Client\Core;
-
 use Opendi\Lang\Json;
 
 class CoreTest extends \PHPUnit_Framework_TestCase

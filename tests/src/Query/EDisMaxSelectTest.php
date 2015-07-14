@@ -30,5 +30,6 @@ class EDisMaxSelectTest extends \PHPUnit_Framework_TestCase
         $expected = "defType=edismax&boost=$boost";
         $actual = $select->render();
 
-        $this->assertSame($expected, $actual);    }
+        $this->assertSame($expected, $actual);
+    }
 }
