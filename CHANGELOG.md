@@ -1,6 +1,17 @@
 Opendi Solr Client Changelog
 ============================
 
+1.0.1. (2015-09-09)
+-------------------
+
+* Added `SolrClientServiceProvider::factory()`
+* Fixed passing of options to Guzzle
+
+1.0.0 (2015-07-17)
+------------------
+
+* No changes compared to beta1
+
 1.0.0-beta1 (2015-07-14)
 ------------------------
 
