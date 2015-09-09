@@ -66,7 +66,7 @@ class SolrClientServiceProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Client::class, $client);
 
         $guzzle = $client->getGuzzleClient();
-        $this->assertSame((string) $guzzle->getConfig('base_uri'), $actual);
+        $this->assertSame($url, (string) $guzzle->getConfig('base_uri'));
         $this->assertSame([$user, $pass], $guzzle->getConfig('auth'));
         $this->assertSame($timeout, $guzzle->getConfig('timeout'));
     }
