@@ -14,12 +14,12 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client\Tests;
+namespace Opendi\Solr\Client\Tests\Providers;
 
 use Opendi\Solr\Client\Client;
 use Opendi\Solr\Client\Providers\SolrClientServiceProvider;
 
-class ProviderTest extends \PHPUnit_Framework_TestCase
+class SolrClientServiceProviderTest extends \PHPUnit_Framework_TestCase
 {
     public function testProvider()
     {
@@ -42,11 +42,32 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
-     * @expectedExceptionMessage You must give a base_uri for the solr provider
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage You must specify the base_uri option.
      */
     public function testNoBaseUrl()
     {
         new SolrClientServiceProvider([]);
+    }
+
+    public function testFactory()
+    {
+        $url = 'http://localhost:8983/solr/';
+        $user = "foo";
+        $pass = "bar";
+        $timeout = 13;
+        $options = ['timeout' => $timeout];
+
+        $container = new \Pimple\Container();
+        $provider = SolrClientServiceProvider::factory($url, $user, $pass, $options);
+        $container->register($provider);
+
+        $client = $container['solr'];
+        $this->assertInstanceOf(Client::class, $client);
+
+        $guzzle = $client->getGuzzleClient();
+        $this->assertSame((string) $guzzle->getConfig('base_uri'), $actual);
+        $this->assertSame([$user, $pass], $guzzle->getConfig('auth'));
+        $this->assertSame($timeout, $guzzle->getConfig('timeout'));
     }
 }

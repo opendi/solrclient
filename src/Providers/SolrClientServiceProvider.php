@@ -22,27 +22,54 @@ use Pimple\ServiceProviderInterface;
 use GuzzleHttp\Client as GuzzleClient;
 use Opendi\Solr\Client\Client as SolrClient;
 
+/**
+ * A service provider for the Pimple DI container.
+ */
 class SolrClientServiceProvider implements ServiceProviderInterface
 {
-    public function __construct($settings)
+    /**
+     * Guzzle options.
+     *
+     * @var array
+     * @see http://guzzle.readthedocs.org/en/latest/request-options.html
+     */
+    private $options;
+
+    public function __construct(array $options)
     {
-        $defaultSettings = [
-            'base_uri' => null,
-        ];
-
-        $this->settings = array_merge($defaultSettings, $settings);
-
-        if (empty($this->settings['base_uri'])) {
-            throw new \Exception("You must give a base_uri for the solr provider.");
+        if (empty($options['base_uri'])) {
+            throw new \InvalidArgumentException("You must specify the base_uri option.");
         }
+
+        $this->options = $options;
+    }
+
+    /**
+     * Factory method for simpler initiation.
+     *
+     * @param  string $host     Solr host URI.
+     * @param  string $user     Username for basic auth.
+     * @param  string $pass     Password for basic auth.
+     * @param  array  $options  Additional Guzzle options.
+     *
+     * @see http://guzzle.readthedocs.org/en/latest/request-options.html
+     *
+     * @return SolrClientServiceProvider
+     */
+    public static function factory($host, $user = null, $pass = null, array $options = [])
+    {
+        $options['base_uri'] = $host;
+        if (!empty($user) && !empty($pass)) {
+            $options['auth'] = [$user, $pass];
+        }
+
+        return new self($options);
     }
 
     public function register(Container $container)
     {
         $container['solr'] = function () {
-            $guzzle = new GuzzleClient([
-                'base_uri' => $this->settings['base_uri']
-            ]);
+            $guzzle = new GuzzleClient($this->options);
 
             return new SolrClient($guzzle);
         };
