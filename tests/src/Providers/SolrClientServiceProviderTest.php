@@ -14,12 +14,12 @@
  *  either express or implied. See the License for the specific
  *  language governing permissions and limitations under the License.
  */
-namespace Opendi\Solr\Client\Tests;
+namespace Opendi\Solr\Client\Tests\Providers;
 
 use Opendi\Solr\Client\Client;
 use Opendi\Solr\Client\Providers\SolrClientServiceProvider;
 
-class ProviderTest extends \PHPUnit_Framework_TestCase
+class SolrClientServiceProviderTest extends \PHPUnit_Framework_TestCase
 {
     public function testProvider()
     {
@@ -42,8 +42,8 @@ class ProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
-     * @expectedExceptionMessage You must give a base_uri for the solr provider
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage You must specify the base_uri option.
      */
     public function testNoBaseUrl()
     {
