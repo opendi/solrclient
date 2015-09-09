@@ -58,7 +58,7 @@ class SolrClientServiceProvider implements ServiceProviderInterface
      */
     public static function factory($host, $user = null, $pass = null, array $options = [])
     {
-        $options = ['base_uri' => $host];
+        $options['base_uri'] = $host;
         if (!empty($user) && !empty($pass)) {
             $options['auth'] = [$user, $pass];
         }
@@ -69,9 +69,7 @@ class SolrClientServiceProvider implements ServiceProviderInterface
     public function register(Container $container)
     {
         $container['solr'] = function () {
-            $guzzle = new GuzzleClient([
-                'base_uri' => $this->options['base_uri']
-            ]);
+            $guzzle = new GuzzleClient($this->options);
 
             return new SolrClient($guzzle);
         };

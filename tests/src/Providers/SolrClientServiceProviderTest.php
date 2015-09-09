@@ -49,4 +49,25 @@ class SolrClientServiceProviderTest extends \PHPUnit_Framework_TestCase
     {
         new SolrClientServiceProvider([]);
     }
+
+    public function testFactory()
+    {
+        $url = 'http://localhost:8983/solr/';
+        $user = "foo";
+        $pass = "bar";
+        $timeout = 13;
+        $options = ['timeout' => $timeout];
+
+        $container = new \Pimple\Container();
+        $provider = SolrClientServiceProvider::factory($url, $user, $pass, $options);
+        $container->register($provider);
+
+        $client = $container['solr'];
+        $this->assertInstanceOf(Client::class, $client);
+
+        $guzzle = $client->getGuzzleClient();
+        $this->assertSame((string) $guzzle->getConfig('base_uri'), $actual);
+        $this->assertSame([$user, $pass], $guzzle->getConfig('auth'));
+        $this->assertSame($timeout, $guzzle->getConfig('timeout'));
+    }
 }
