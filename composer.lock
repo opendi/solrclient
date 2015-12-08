@@ -4,7 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "85d81ba289669198b5f83187555ebee0",
+    "hash": "e385756fb52471cf5d5e1cfe40e1c048",
+    "content-hash": "5e9ea52d5295c1b455f4abacd0d17cfb",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -179,20 +180,20 @@
         },
         {
             "name": "opendi/lang",
-            "version": "0.3.6",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/opendi/lang.git",
-                "reference": "02077432744f04ab4df4262f2458d017c1311162"
+                "reference": "cf4397fae868c1353ea23e1eb06f7772c0f5ec3c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/opendi/lang/zipball/02077432744f04ab4df4262f2458d017c1311162",
-                "reference": "02077432744f04ab4df4262f2458d017c1311162",
+                "url": "https://api.github.com/repos/opendi/lang/zipball/cf4397fae868c1353ea23e1eb06f7772c0f5ec3c",
+                "reference": "cf4397fae868c1353ea23e1eb06f7772c0f5ec3c",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0"
+                "php": ">=5.5.0"
             },
             "type": "library",
             "autoload": {
@@ -215,7 +216,7 @@
                 "date",
                 "lang"
             ],
-            "time": "2015-05-08 15:03:55"
+            "time": "2015-12-08 10:06:55"
         },
         {
             "name": "pimple/pimple",
@@ -317,12 +318,12 @@
             "version": "v2.7.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/Console.git",
+                "url": "https://github.com/symfony/console.git",
                 "reference": "8cf484449130cabfd98dcb4694ca9945802a21ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Console/zipball/8cf484449130cabfd98dcb4694ca9945802a21ed",
+                "url": "https://api.github.com/repos/symfony/console/zipball/8cf484449130cabfd98dcb4694ca9945802a21ed",
                 "reference": "8cf484449130cabfd98dcb4694ca9945802a21ed",
                 "shasum": ""
             },
