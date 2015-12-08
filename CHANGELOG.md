@@ -1,6 +1,11 @@
 Opendi Solr Client Changelog
 ============================
 
+1.1.0. (2015-12-07)
+-------------------
+
+* Update to new major version of `opendi/lang` (for php7 compatibility)
+
 1.0.2. (2015-09-09)
 -------------------
 
