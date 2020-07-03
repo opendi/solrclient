@@ -7,6 +7,11 @@ Classes for the busy PHP developer to work with Apache Solr.
 [![Packagist](https://img.shields.io/packagist/v/opendi/solrclient.svg?style=flat-square)]()
 [![License](https://img.shields.io/github/license/opendi/solrclient.svg)](https://github.com/opendi/solrclient/blob/develop/LICENSE)
 
+Requirements
+------------
+
+This package requires at least PHP 5.5.9.
+
 Construction
 ------------
 
